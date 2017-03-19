@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<metadata>
+  <components>
+    <component name="platform.utilities.debug_console.support" requires="platform.drivers.lpc_usart"/>
+	<component name="platform.utilities.debug_console.support" requires="platform.drivers.lpsci"/>
+	<component name="platform.utilities.debug_console.support" requires="platform.drivers.lpuart"/>
+	<component name="platform.utilities.debug_console.support" requires="platform.drivers.uart"/>
+    <component name="platform.utilities.debug_console" requires="platform.drivers.common platform.utilities.debug_console.support" type="utilities" provides="platform.utilities">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_debug_console.c"/>
+        <files mask="fsl_debug_console.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>
