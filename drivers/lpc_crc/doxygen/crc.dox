@@ -1,0 +1,265 @@
+/*!
+@defgroup crc CRC: Cyclic Redundancy Check Driver
+@details SDK provides the Peripheral driver for the Cyclic Redundancy Check (CRC) module of LPC devices.@n
+ @n
+The cyclic redundancy check (CRC) module generates 16/32-bit CRC code for error detection.
+The CRC module provides three variants of polynomials, a programmable seed and other parameters required to implement a 16-bit or 32-bit CRC standard.
+ @n
+
+
+# CRC Driver Initialization and Configuration {#CRCInit}
+
+CRC_Init() function enables the clock for the CRC module in the LPC SYSCON block and fully (re-)configures the CRC module according to configuration structure.
+It also starts checksum computation by writing the seed.
+
+The seed member of the configuration structure is the initial checksum for which new data can be added to.
+When starting new checksum computation, the seed shall be set to the initial checksum per the CRC protocol specification.
+For continued checksum operation, the seed shall be set to the intermediate checksum value as obtained from previous calls to CRC_GetConfig() function.
+After CRC_Init(), one or multiple CRC_WriteData() calls follow to update checksum with data, then CRC_Get16bitResult() or CRC_Get32bitResult() follows to read the result.
+CRC_Init() can be called as many times as required, thus, allows for runtime changes of CRC protocol.
+
+CRC_GetDefaultConfig() function can be used to set the module configuration structure with parameters for CRC-16/CCITT-FALSE protocol.
+
+CRC_Deinit() function disables clock to the CRC module.
+
+CRC_Reset() performs hardware reset of the CRC module.
+
+# CRC Write Data {#CRCWrite}
+
+The CRC_WriteData() function is used to add data to actual CRC. Internally it tries to use 32-bit reads and writes for all aligned data in the user buffer
+and it uses 8-bit reads and writes for all unaligned data in the user buffer. This function can update CRC with user supplied data chunks of arbitrary size,
+so one can update CRC byte by byte or with all bytes at once. Prior call of CRC configuration function CRC_Init() fully specifies the CRC module
+configuration for CRC_WriteData() call.
+
+# CRC Get Checksum {#CRCGet}
+
+The CRC_Get16bitResult() or CRC_Get32bitResult() function is used to read the CRC module checksum register.
+The bit reverse and 1's complement operations are already applied to the result if previously configured.
+Use CRC_GetConfig() function to get the actual checksum without bit reverse and 1's complement applied so it can be used as seed when resuming calculation later.
+
+* CRC_Init() / CRC_WriteData() / CRC_Get16bitResult() to get final checksum.
+
+* CRC_Init() / CRC_WriteData() / ... / CRC_WriteData() / CRC_Get16bitResult() to get final checksum.
+
+* CRC_Init() / CRC_WriteData() / CRC_GetConfig() to get intermediate checksum to be used as seed value in future.
+
+* CRC_Init() / CRC_WriteData() / ... / CRC_WriteData() / CRC_GetConfig() to get intermediate checksum.
+
+# Comments about API usage in RTOS {#CRCRtos}
+
+If multiple RTOS tasks share the CRC module to compute checksums with different data and/or protocols, the following needs to be implemented by the user:
+
+
+The triplets
+
+* CRC_Init() / CRC_WriteData() / CRC_Get16bitResult() or CRC_Get32bitResult() or CRC_GetConfig()
+
+shall be protected by RTOS mutex to protect CRC module against concurrent accesses from different tasks. Example:
+@code{.c}
+    CRC_Module_RTOS_Mutex_Lock;
+    CRC_Init();
+    CRC_WriteData();
+    CRC_Get16bitResult();
+    CRC_Module_RTOS_Mutex_Unlock;
+@endcode
+
+Alternatively, the context switch handler could read original configuration and restore it when switching back to original task/thread:
+
+@code{.c}
+    CRC_GetConfig(base, &originalConfig);
+    /* ... other task using CRC engine... */
+    CRC_Init(base, &originalConfig);
+@endcode
+
+# Comments about API usage in interrupt handler {#CRCisr}
+
+All APIs can be used from interrupt handler although execution time shall be considered (interrupt latency of equal and lower priority interrupts increases).
+Protection against concurrent accesses from different interrupt handlers and/or tasks shall be assured by the user.
+
+# CRC Driver Examples {#CRCEx}
+
+## Simple examples {#CRCSimpleEx}
+
+
+Simple example with default CRC-16/CCITT-FALSE protocol
+@code{.c}
+    crc_config_t config;
+    CRC_Type *base;
+    uint8_t data[] = {0x00, 0x01, 0x02, 0x03, 0x04};
+    uint16_t checksum;
+
+    base = CRC0;
+    CRC_GetDefaultConfig(base, &config); /* default gives CRC-16/CCITT-FALSE */
+    CRC_Init(base, &config);
+    CRC_WriteData(base, data, sizeof(data));
+    checksum = CRC_Get16bitResult(base);
+    CRC_Deinit(base);
+@endcode
+
+
+Simple example with CRC-32 protocol configuration
+@code{.c}
+    crc_config_t config;
+    uint32_t checksum;
+
+    config.polynomial = kCRC_Polynomial_CRC_32;
+    config.reverseIn = true;
+    config.complementIn = false;
+    config.reverseOut = true;
+    config.complementOut = true;
+    config.seed = 0xFFFFFFFFu;
+    
+    CRC_Init(base, &config);
+    /* example: update by 1 byte at time */
+    while (dataSize)
+    {
+        uint8_t c = GetCharacter();
+        CRC_WriteData(base, &c, 1);
+        dataSize--;
+    }
+    checksum = CRC_Get32bitResult(base);
+    CRC_Deinit(base);
+@endcode
+
+## Advanced examples {#CRCAdvancedEx}
+Per-partes data updates with context switch between. Assuming we have 3 tasks/threads, each using CRC module to compute checksums of different protocol,
+with context switches.
+
+Firstly, we prepare 3 CRC configurations for 3 different protocols: CRC-16 (ARC), CRC-16/CCITT-FALSE and CRC-32. Table below lists the individual protocol specifications.
+See also: http://reveng.sourceforge.net/crc-catalogue/
+
+<table>
+  <tr>
+    <th></th>
+    <th>CRC-16/CCITT-FALSE</th>
+    <th>CRC-16</th>
+    <th>CRC-32</th>
+  </tr>
+  <tr>
+    <td><b>Width</b></td>
+    <td>16 bits</td>
+    <td>16 bits</td>
+    <td>32 bits</td>
+  </tr>
+  <tr>
+    <td><b>Polynomial</b></td>
+    <td>0x1021</td>
+    <td>0x8005</td>
+    <td>0x04C11DB7</td>
+  </tr>
+  <tr>
+    <td><b>Initial seed</b></td>
+    <td>0xFFFF</td>
+    <td>0x0000</td>
+    <td>0xFFFFFFFF</td>
+  </tr>
+  <tr>
+    <td><b>Complement checksum</b></td>
+    <td>No</td>
+    <td>No</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td><b>Reflect In</b></td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td><b>Reflect Out</b></td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+</table>
+
+Corresponding functions to get configurations:
+
+@code{.c}
+void GetConfigCrc16Ccitt(CRC_Type *base, crc_config_t *config)
+{
+    config->polynomial = kCRC_Polynomial_CRC_CCITT;
+    config->reverseIn = false;
+    config->complementIn = false;
+    config->reverseOut = false;
+    config->complementOut = false;
+    config->seed = 0xFFFFU;
+}
+
+void GetConfigCrc16(CRC_Type *base, crc_config_t *config)
+{
+    config->polynomial = kCRC_Polynomial_CRC_16;
+    config->reverseIn = true;
+    config->complementIn = false;
+    config->reverseOut = true;
+    config->complementOut = false;
+    config->seed = 0x0U;
+}
+
+void GetConfigCrc32(CRC_Type *base, crc_config_t *config)
+{
+    config->polynomial = kCRC_Polynomial_CRC_32;
+    config->reverseIn = true;
+    config->complementIn = false;
+    config->reverseOut = true;
+    config->complementOut = true;
+    config->seed = 0xFFFFFFFFU;
+}
+@endcode
+
+The following context switches show possible API usage:
+
+@code{.c}
+    uint16_t checksumCrc16;
+    uint32_t checksumCrc32;
+    uint16_t checksumCrc16Ccitt;
+
+    crc_config_t configCrc16;
+    crc_config_t configCrc32;
+    crc_config_t configCrc16Ccitt;
+    
+    GetConfigCrc16(base, &configCrc16);
+    GetConfigCrc32(base, &configCrc32);
+    GetConfigCrc16Ccitt(base, &configCrc16Ccitt);
+    
+    /* Task A bytes[0-3] */    
+    CRC_Init(base, &configCrc16);
+    CRC_WriteData(base, &data[0], 4);
+    CRC_GetConfig(base, &configCrc16);
+    
+    /* Task B bytes[0-3] */
+    CRC_Init(base, &configCrc16Ccitt);
+    CRC_WriteData(base, &data[0], 4);
+    CRC_GetConfig(base, &configCrc16Ccitt);
+
+    /* Task C 4 bytes[0-3] */
+    CRC_Init(base, &configCrc32);
+    CRC_WriteData(base, &data[0], 4);
+    CRC_GetConfig(base, &configCrc32);
+
+    /* Task B add final 5 bytes[4-8] */
+    CRC_Init(base, &configCrc16Ccitt);
+    CRC_WriteData(base, &data[4], 5);
+    checksumCrc16Ccitt = CRC_Get16bitResult(base);
+
+    /* Task C 3 bytes[4-6] */
+    CRC_Init(base, &configCrc32);
+    CRC_WriteData(base, &data[4], 3);
+    CRC_GetConfig(base, &configCrc32);
+
+    /* Task A 3 bytes[4-6] */
+    CRC_Init(base, &configCrc16);
+    CRC_WriteData(base, &data[4], 3);
+    CRC_GetConfig(base, &configCrc16);
+    
+    /* Task C add final 2 bytes[7-8] */
+    CRC_Init(base, &configCrc32);
+    CRC_WriteData(base, &data[7], 2);
+    checksumCrc32 = CRC_Get32bitResult(base);
+
+    /* Task A add final 2 bytes[7-8] */
+    CRC_Init(base, &configCrc16);
+    CRC_WriteData(base, &data[7], 2);
+    checksumCrc16 = CRC_Get16bitResult(base);
+@endcode
+*/

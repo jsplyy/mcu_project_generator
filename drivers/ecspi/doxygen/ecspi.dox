@@ -1,0 +1,131 @@
+/*!
+@defgroup ecspi ECSPI: Serial Peripheral Interface Driver
+*/
+
+/*!
+@defgroup ecspi_driver ECSPI Driver
+@ingroup ecspi
+@details
+
+ECSPI driver includes functional APIs and transactional APIs.
+
+Functional APIs are feature/property target low level APIs.
+Functional APIs can be used for ecSPI initialization/configuration/operation for
+optimization/customization purpose. Using the functional API requires the
+knowledge of the SPI peripheral and how to organize functional APIs to
+meet the application requirements. All functional API use the peripheral base
+address as the first parameter. ECSPI functional operation groups provide the
+functional API set.
+
+Transactional APIs are transaction target high level APIs.
+Transactional APIs can be used to enable the peripheral and in the
+application if the code size and performance of transactional APIs satisfy the
+requirements. If the code size and performance are a critical requirement,
+see the transactional API implementation and write a custom code. All
+transactional APIs use the spi_handle_t as the first parameter.
+Initialize the handle by calling the SPI_MasterTransferCreateHandle() or SPI_SlaveTransferCreateHandle() API.
+
+Transactional APIs support asynchronous transfer. This means that the functions
+SPI_MasterTransferNonBlocking() and SPI_SlaveTransferNonBlocking() set up the interrupt for data
+transfer. When the transfer completes, the upper layer is notified through a callback
+function with the kStatus_SPI_Idle status.
+
+# Typical use case {#ECSPICase}
+
+## SPI master transfer using polling method {#ECSPICasePolling}
+
+~~~~~{.c}
+#define TRANSFER_SIZE 64U         /* Transfer dataSize */
+
+uint32_t masterRxData[TRANSFER_SIZE] = {0U};
+uint32_t masterTxData[TRANSFER_SIZE] = {0U};
+
+void main(void)
+{
+    uint32_t srcClock_Hz;
+    uint32_t errorCount;
+    uint32_t loopCount = 1U;
+    ecspi_master_config_t masterConfig;
+    ecspi_transfer_t masterXfer;
+
+    /* Master config */
+    ECSPI_MasterGetDefaultConfig(&masterConfig);
+    srcClock_Hz = CLOCK_GetFreq(ECSPI_MASTER_CLK_SRC);
+    ECSPI_MasterInit(EXAMPLE_ECSPI_MASTER_BASEADDR, &masterConfig, srcClock_Hz);
+
+    while (1)
+    {
+        /* Start master transfer, send data to slave */
+        masterXfer.txData = masterTxData;
+        masterXfer.rxData = NULL;
+        masterXfer.dataSize = TRANSFER_SIZE;
+        masterXfer.channel = kECSPI_Channel0;
+        ECSPI_MasterTransferBlocking(EXAMPLE_ECSPI_MASTER_BASEADDR, &masterXfer);
+
+        /* Delay to wait slave is ready */
+        for (i = 0U; i < EXAMPLE_ECSPI_DEALY_COUNT; i++)
+        {
+            __NOP();
+        }
+
+        /* Start master transfer, receive data from slave */
+        masterXfer.txData = NULL;
+        masterXfer.rxData = masterRxData;
+        masterXfer.dataSize = TRANSFER_SIZE;
+        masterXfer.channel = kECSPI_Channel0;
+        ECSPI_MasterTransferBlocking(EXAMPLE_ECSPI_MASTER_BASEADDR, &masterXfer);
+
+        /* Wait for press any key */
+        PRINTF("\r\n Press any key to run again\r\n");
+        GETCHAR();
+
+        /* Increase loop count to change transmit buffer */
+        loopCount++;
+    }
+}
+~~~~~
+
+##SPI master transfer using an interrupt method {#ECSPICaseInterrupt}
+
+~~~~~ {.c}
+#define BUFFER_LEN (64)
+ecspi_master_handle_t spiHandle;
+ecspi_master_config_t masterConfig;
+ecspi_transfer_t xfer;
+volatile bool isFinished = false;
+
+const uint32_t sendData[BUFFER_LEN] = [......];
+uint32_t receiveBuff[BUFFER_LEN];
+
+void ECSPI_UserCallback(ECSPI_Type *base, ecspi_master_handle_t *handle, status_t status, void *userData)
+{
+    isFinished = true;
+}
+
+void main(void)
+{
+    //...
+
+    ECSPI_MasterGetDefaultConfig(&masterConfig);
+
+    ECSPI_MasterInit(ECSPI4, &masterConfig);
+    ECSPI_MasterTransferCreateHandle(ECSPI4, &ecspiHandle, ECSPI_UserCallback, NULL);
+
+    // Prepare to send.
+    xfer.txData = sendData;
+    xfer.rxData = receiveBuff;
+    xfer.dataSize = BUFFER_LEN;
+
+    // Send out.
+    ECSPI_MasterTransferNonBlocking(ECSPI4, &ecspiHandle, &xfer);
+
+    // Wait send finished.
+    while (!isFinished)
+    {
+    }
+
+    // ...
+}
+~~~~~
+
+*/

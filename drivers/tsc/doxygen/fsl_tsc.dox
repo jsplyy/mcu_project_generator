@@ -1,0 +1,159 @@
+/*!
+@defgroup  tsc TSC: Touch Screen Controller Driver
+@details The SDK provides Peripheral driver for the Touch Screen Controller(TSC) 
+         module of Kinetis devices.
+
+# Typical use case {#TSCTpyUC}
+
+## 4-wire Polling Configuration {#TSCPolConfig}
+
+~~~~~{.c}
+    // ...
+    
+    tsc_config_t k_tscConfig;
+
+    BOARD_InitHardware();
+
+    PRINTF("TSC fourWireModePolling Example Start!\r\n");
+
+    ADC_Configuration();
+
+    TSC_GetDefaultConfig(&k_tscConfig);
+    k_tscConfig.enableAutoMeasure = true;
+    TSC_Init(DEMO_TSC_BASE, &k_tscConfig);
+    TSC_EnableInterruptSignals(DEMO_TSC_BASE, kTSC_ValidSignalEnable);
+    PRINTF("Please touch screen.\r\n");
+
+    while (1)
+    {
+        TSC_SoftwareReset(DEMO_TSC_BASE);
+        TSC_StartSenseDetection(DEMO_TSC_BASE);
+        while ((TSC_GetStatusFlags(DEMO_TSC_BASE) & kTSC_StateMachineFlag) != kTSC_IdleState)
+        {
+        }
+        if ((TSC_GetInterruptStatusFlags(DEMO_TSC_BASE) & kTSC_ValidSignalFlag) == kTSC_ValidSignalFlag)
+        {
+            TSC_ClearInterruptStatusFlags(DEMO_TSC_BASE, kTSC_ValidSignalFlag);
+            PRINTF("x = %d, y = %d\r\n", TSC_GetMeasureValue(TSC, kTSC_XCoordinateValueSelection),
+                   TSC_GetMeasureValue(TSC, kTSC_YCoordinateValueSelection));
+        }
+    }
+
+    // ...
+    
+    void ADC_Configuration(void)
+    {
+        adc_5hc_config_t k_adcConfig;
+        adc_5hc_channel_config_t k_adcChannelConfig;
+
+        ADC_5HC_GetDefaultConfig(&k_adcConfig);
+        ADC_5HC_Init(DEMO_ADC_BASE, &k_adcConfig);
+        ADC_5HC_EnableHardwareTrigger(DEMO_ADC_BASE, true);
+
+        k_adcChannelConfig.channelNumber = 1U; 
+        k_adcChannelConfig.enableInterruptOnConversionCompleted = false;
+        ADC_5HC_SetChannelConfig(DEMO_ADC_BASE, 3U, &k_adcChannelConfig);
+        k_adcChannelConfig.channelNumber = 3U;
+        ADC_5HC_SetChannelConfig(DEMO_ADC_BASE, 1U, &k_adcChannelConfig);
+
+        if (kStatus_Success == ADC_5HC_DoAutoCalibration(DEMO_ADC_BASE))
+        {
+            PRINTF("ADC_5HC_DoAntoCalibration() Done.\r\n");
+        }
+        else
+        {
+            PRINTF("ADC_5HC_DoAutoCalibration() Failed.\r\n");
+        }
+    }
+~~~~~
+
+## 4-wire Interrupt Configuration {#TSCIntConfig}
+
+~~~~~{.c}
+    // ...
+    
+    tsc_config_t k_tscConfig;
+
+    BOARD_InitHardware();
+
+    PRINTF("TSC fourWireModeInterrupt Example Start!\r\n");
+
+    ADC_Configuration();
+    GIC_Configuration();
+
+    TSC_GetDefaultConfig(&k_tscConfig);
+    TSC_Init(DEMO_TSC_BASE, &k_tscConfig);
+    TSC_EnableInterruptSignals(DEMO_TSC_BASE,
+                               kTSC_ValidSignalEnable | kTSC_MeasureSignalEnable | kTSC_DetectSignalEnable);
+    TSC_EnableInterrupts(DEMO_TSC_BASE, kTSC_MeasureInterruptEnable | kTSC_DetectInterruptEnable);
+    PRINTF("Please touch screen.\r\n");
+
+    while (1)
+    {
+        TSC_SoftwareReset(DEMO_TSC_BASE);
+        TSC_StartSenseDetection(DEMO_TSC_BASE);
+        while ((TSC_GetStatusFlags(DEMO_TSC_BASE) & kTSC_StateMachineFlag) != kTSC_IdleState)
+        {
+        }
+        if (g_tscTouch)
+        {
+            g_tscTouch = false;
+            PRINTF("x = %d, y = %d\r\n", TSC_GetMeasureValue(DEMO_TSC_BASE, kTSC_XCoordinateValueSelection),
+                   TSC_GetMeasureValue(DEMO_TSC_BASE, kTSC_YCoordinateValueSelection));
+        }
+    }
+    
+    // ...
+
+    void ADC_Configuration(void)
+    {
+        adc_5hc_config_t k_adcConfig;
+        adc_5hc_channel_config_t k_adcChannelConfig;
+
+        ADC_5HC_GetDefaultConfig(&k_adcConfig);
+        ADC_5HC_Init(DEMO_ADC_BASE, &k_adcConfig);
+        ADC_5HC_EnableHardwareTrigger(DEMO_ADC_BASE, true);
+
+        k_adcChannelConfig.channelNumber = 1U; /* Channel1 is ynlr port. */
+        k_adcChannelConfig.enableInterruptOnConversionCompleted = false;
+        ADC_5HC_SetChannelConfig(DEMO_ADC_BASE, 3U, &k_adcChannelConfig);
+        k_adcChannelConfig.channelNumber = 3U; /* Channel3 is xnur port. */
+        ADC_5HC_SetChannelConfig(DEMO_ADC_BASE, 1U, &k_adcChannelConfig);
+
+        if (kStatus_Success == ADC_5HC_DoAutoCalibration(DEMO_ADC_BASE))
+        {
+            PRINTF("ADC_5HC_DoAntoCalibration() Done.\r\n");
+        }
+        else
+        {
+            PRINTF("ADC_5HC_DoAutoCalibration() Failed.\r\n");
+        }
+    }
+
+
+    void GIC_Configuration(void)
+    {
+        GIC_EnableIRQ(TSC_IRQn);
+    }
+
+    void EXAMPLE_TSC_IRQHandler(void)
+    {
+        if ((TSC_GetInterruptStatusFlags(DEMO_TSC_BASE) & kTSC_DetectSignalFlag) == kTSC_DetectSignalFlag)
+        {
+            TSC_ClearInterruptStatusFlags(DEMO_TSC_BASE, kTSC_DetectSignalFlag);
+            TSC_StartMeasure(DEMO_TSC_BASE);
+        }
+        else
+        {
+            if ((TSC_GetInterruptStatusFlags(DEMO_TSC_BASE) & kTSC_ValidSignalFlag) == kTSC_ValidSignalFlag)
+            {
+                TSC_ClearInterruptStatusFlags(DEMO_TSC_BASE, kTSC_ValidSignalFlag);
+                g_tscTouch = true;
+            }
+            TSC_ClearInterruptStatusFlags(DEMO_TSC_BASE, kTSC_MeasureSignalFlag);
+        }
+    }
+
+~~~~~
+
+*/

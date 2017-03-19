@@ -1,0 +1,70 @@
+/*!
+@defgroup pint_driver PINT: Pin Interrupt and Pattern Match Driver
+
+@details The SDK provides a driver for the Pin Interrupt and Pattern match (PINT).@n
+ @n
+It can configure one or more pins to generate a pin interrupt when the pin or pattern match conditions are met.
+The pins do not have to be configured as gpio pins however they must be connected to PINT via INPUTMUX. Only the pin interrupt or pattern match function can be active for interrupt generation. If the pin interrupt function is enabled then the pattern match function can be used for wakeup via RXEV.
+ @n
+
+
+ # Pin Interrupt and Pattern match Driver operation {#PINTInit}
+
+PINT_PinInterruptConfig() function configures the pins for pin interrupt.
+
+PINT_PatternMatchConfig() function configures the pins for pattern match.
+
+## Pin Interrupt use case {#PINTPinInterruptTpyUC}
+
+~~~~~{.c}
+void pint_intr_callback(pint_pin_int_t pintr, uint32_t pmatch_status)
+{
+    /* Take action for pin interrupt */
+}
+    
+	/* Connect trigger sources to PINT */
+    INPUTMUX_Init(INPUTMUX);
+    INPUTMUX_AttachSignal(INPUTMUX, kPINT_PinInt0, PINT_PIN_INT0_SRC);
+
+    /* Initialize PINT */
+    PINT_Init(PINT);
+
+    /* Setup Pin Interrupt 0 for rising edge */
+    PINT_PinInterruptConfig(PINT, kPINT_PinInt0, kPINT_PinIntEnableRiseEdge, pint_intr_callback);
+
+
+    /* Enable callbacks for PINT */
+    PINT_EnableCallback(PINT);
+~~~~~
+
+## Pattern match use case {#PINTPatternMatchUC}
+~~~~~{.c}
+void pint_intr_callback(pint_pin_int_t pintr, uint32_t pmatch_status)
+{
+    /* Take action for pin interrupt */
+}
+
+    pint_pmatch_cfg_t pmcfg;
+    
+	/* Connect trigger sources to PINT */
+    INPUTMUX_Init(INPUTMUX);
+    INPUTMUX_AttachSignal(INPUTMUX, kPINT_PinInt0, PINT_PIN_INT0_SRC);
+
+    /* Initialize PINT */
+    PINT_Init(PINT);
+
+    /* Setup Pattern Match Bit Slice 0 */
+    pmcfg.bs_src = kPINT_PatternMatchInp0Src;
+    pmcfg.bs_cfg = kPINT_PatternMatchStickyFall;
+    pmcfg.callback = pint_intr_callback;
+    pmcfg.end_point = true;
+    PINT_PatternMatchConfig(PINT, kPINT_PatternMatchBSlice0, &pmcfg);
+
+    /* Enable PatternMatch */
+    PINT_PatternMatchEnable(PINT);
+
+    /* Enable callbacks for PINT */
+    PINT_EnableCallback(PINT);
+~~~~~
+*/
+

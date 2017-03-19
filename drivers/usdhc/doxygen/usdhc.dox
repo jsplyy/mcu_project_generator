@@ -1,0 +1,64 @@
+/*
+@page drv_err Driver errors status
+ - #kStatus_USDHC_BusyTransferring 
+ - #kStatus_USDHC_PrepareAdmaDescriptorFailed 
+ - #kStatus_USDHC_SendCommandFailed 
+ - #kStatus_USDHC_TransferDataFailed
+ - #kStatus_USDHC_DMADataAddrNotAlign
+ - #kStatus_USDHC_ReTuningRequest
+ - #kStatus_USDHC_TransferDataSuccess
+ - #kStatus_USDHC_TransferCmdSuccess
+*/
+
+/*!
+@defgroup usdhc USDHC: ultra Secured Digital Host Controller Driver
+@details The KSDK provides a peripheral driver for the ultra Secured Digital Host Controller (USDHC) module of Kinetis/i.mx devices.
+
+# Typical use case {#USDHCTypUC}
+
+## USDHC Operation {#USDHCOperation}
+
+~~~~~{.c}
+    /* Initializes the USDHC. */
+    usdhcConfig->dataTimeout = 0xFU;
+    usdhcConfig->endianMode = kUSDHC_EndianModeLittle;
+    usdhcConfig->readWatermarkLevel = 0x80U;
+    usdhcConfig->writeWatermarkLevel = 0x80U;
+    usdhcConfig->readBurstLen = 16U;
+    usdhcConfig->writeBurstLen = 16U;
+    USDHC_Init(BOARD_USDHC_BASEADDR, usdhcConfig);
+
+    /* Fills state in the card driver. */
+    card->usdhcBase = BOARD_USDHC_BASEADDR;
+    card->usdhcSourceClock = CLOCK_GetFreq(BOARD_USDHC_CLKSRC);
+    card->usdhcTransfer = usdhc_transfer_function;
+
+    /* Initializes the card. */
+    if (SD_Init(card))
+    {
+        PRINTF("\r\nSD card init failed.\r\n");
+    }
+
+    PRINTF("\r\nRead/Write/Erase the card continuously until it encounters error......\r\n");
+    while (true)
+    {
+        if (kStatus_Success != SD_WriteBlocks(card, g_dataWrite, DATA_BLOCK_START, DATA_BLOCK_COUNT))
+        {
+            PRINTF("Write multiple data blocks failed.\r\n");
+        }
+        if (kStatus_Success != SD_ReadBlocks(card, g_dataRead, DATA_BLOCK_START, DATA_BLOCK_COUNT))
+        {
+            PRINTF("Read multiple data blocks failed.\r\n");
+        }
+
+        if (kStatus_Success != SD_EraseBlocks(card, DATA_BLOCK_START, DATA_BLOCK_COUNT))
+        {
+            PRINTF("Erase multiple data blocks failed.\r\n");
+        }
+    }
+
+    SD_Deinit(card);
+~~~~~
+
+*/
+

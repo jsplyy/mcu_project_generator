@@ -1,0 +1,136 @@
+/*!
+@page drv_err Driver errors status
+ - #kStatus_SPIFI_Busy = 5900
+ - #kStatus_SPIFI_Idle = 5901
+ - #kStatus_SPIFI_Error = 5902
+*/
+
+/*!
+@defgroup spifi SPIFI: SPIFI flash interface driver
+*/
+
+/*!
+@defgroup spifi_driver SPIFI Driver
+@ingroup spifi
+@details
+
+SPIFI driver includes functional APIs.
+
+Functional APIs are feature/property target low level APIs.
+Functional APIs can be used for SPIFI initialization/configuration/operation for
+optimization/customization purpose. Using the functional API requires the
+knowledge of the SPIFI peripheral and how to organize functional APIs to
+meet the application requirements. All functional API use the peripheral base
+address as the first parameter. SPIFI functional operation groups provide the
+functional API set.
+
+# Typical use case {#SPIFICase}
+
+## SPIFI transfer using an polling method {#SPIFICasePolling}
+
+~~~~~{.c}
+    #define PAGE_SIZE (256)
+    #define SECTOR_SIZE (4096)
+    /* Initialize SPIFI */
+    SPIFI_GetDefaultConfig(&config);
+    SPIFI_Init(EXAMPLE_SPIFI, &config, sourceClockFreq);
+  
+    /* Set the buffer */
+    for (i = 0; i < PAGE_SIZE; i ++)
+    {
+        g_buffer[i] = i;
+        
+    }
+
+    /* Write enable */
+    SPIFI_SetCommand(EXAMPLE_SPIFI, &command[WRITE_ENABLE]);
+    /* Set address */
+    SPIFI_SetCommandAddress(EXAMPLE_SPIFI, FSL_FEATURE_SPIFI_START_ADDRESS);
+    /* Erase sector */
+    SPIFI_SetCommand(EXAMPLE_SPIFI, &command[ERASE_SECTOR]);
+    /* Check if finished */
+    check_if_finish();
+
+    /* Program page */
+    
+    while (page < (SECTOR_SIZE/PAGE_SIZE))
+    {
+        SPIFI_SetCommand(EXAMPLE_SPIFI, &command[WRITE_ENABLE]);
+        SPIFI_SetCommandAddress(EXAMPLE_SPIFI, FSL_FEATURE_SPIFI_START_ADDRESS + page * PAGE_SIZE);
+        SPIFI_SetCommand(EXAMPLE_SPIFI, &command[PROGRAM_PAGE]);
+        for (i = 0; i < PAGE_SIZE; i += 4)
+        {
+            for (j = 0; j < 4; j ++)
+            {
+                data |= ((uint32_t)(g_buffer[i + j])) << (j * 8);
+            }
+            SPIFI_WriteData(EXAMPLE_SPIFI, data);
+            data = 0;
+        }
+        page ++;
+        check_if_finish();
+    }
+~~~~~
+
+*/
+
+/*!
+@defgroup spifi_dma_driver SPIFI DMA Driver
+@ingroup spifi
+@details This section describes the programming interface of the SPIFI DMA driver.
+SPIFI DMA driver includes transactional APIs.
+
+Transactional APIs are transaction target high level APIs.
+Transactional APIs can be used to enable the peripheral and in the
+application if the code size and performance of transactional APIs satisfy the
+requirements. If the code size and performance are a critical requirement,
+see the transactional API implementation and write a custom code. All
+transactional APIs use the spifi_handle_t as the first parameter.
+Initialize the handle by calling the SPIFI_TransferCreateHandleDMA() API. 
+
+# Typical use case {#SPIFICase}
+
+## SPIFI Send/receive using a DMA method {#SPIFICaseDma}
+
+~~~~~{.c}
+    /* Initialize SPIFI */
+    #define PAGE_SIZE (256)
+    #define SECTOR_SIZE (4096)
+    SPIFI_GetDefaultConfig(&config);
+    SPIFI_Init(EXAMPLE_SPIFI, &config, sourceClockFreq);
+    SPIFI_TransferRxCreateHandleDMA(EXAMPLE_SPIFI, &handle, callback, NULL, &s_DmaHandle);
+    
+    /* Set the buffer */
+    for (i = 0; i < PAGE_SIZE; i ++)
+    {
+        g_buffer[i] = i;
+    }
+
+    /* Write enable */
+    SPIFI_SetCommand(EXAMPLE_SPIFI, &command[WRITE_ENABLE]);
+    /* Set address */
+    SPIFI_SetCommandAddress(EXAMPLE_SPIFI, FSL_FEATURE_SPIFI_START_ADDRESS);
+    /* Erase sector */
+    SPIFI_SetCommand(EXAMPLE_SPIFI, &command[ERASE_SECTOR]);
+
+    /* Check if finished */
+    check_if_finish();
+
+    /* Program page */
+    while (page < (SECTOR_SIZE/PAGE_SIZE))
+    {
+        SPIFI_SetCommand(EXAMPLE_SPIFI, &command[WRITE_ENABLE]);
+        SPIFI_SetCommandAddress(EXAMPLE_SPIFI, FSL_FEATURE_SPIFI_START_ADDRESS + page * PAGE_SIZE);
+        SPIFI_SetCommand(EXAMPLE_SPIFI, &command[PROGRAM_PAGE]);
+        xfer.data = g_buffer;
+        xfer.dataSize = PAGE_SIZE; 
+        SPIFI_TransferSendDMA(EXAMPLE_SPIFI, &handle, &xfer);
+        while (!finished)
+        {}
+        finished = false;
+        page ++;
+        check_if_finish();
+    }
+~~~~~
+
+*/

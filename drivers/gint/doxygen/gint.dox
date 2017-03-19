@@ -1,0 +1,36 @@
+/*!
+@defgroup gint_driver GINT: Group GPIO Input Interrupt Driver
+
+@details The SDK provides a driver for the Group GPIO Input Interrupt (GINT).
+ @n
+It can configure one or more pins to generate a group interrupt when the pin conditions are met.
+The pins do not have to be configured as gpio pins.
+ @n
+
+
+# Group GPIO Input Interrupt Driver operation {#GINTInit}
+
+GINT_SetCtrl() and GINT_ConfigPins() functions configure the pins.
+
+GINT_EnableCallback() function enables the callback functionality. Callback function is called when the pin conditions are met.
+
+# Typical use case {#GINTTypUC}
+~~~~~{.c}
+void gint_callback(void)
+{
+    /* Take action for gint event */;
+}
+    
+    /* Initialize GINT */
+    GINT_Init(GINT0);
+
+    /* Setup GINT for edge trigger, "OR" mode. */
+    GINT_SetCtrl(GINT0, kGINT_CombOr, kGINT_TrigEdge, gint_callback);
+
+    /* Select pins & polarity for GINT0 */
+    GINT_ConfigPins(GINT0, GINT_PORT, GINT_POL_MASK, GINT_ENA_MASK);
+
+    /* Enable callback for GINT */
+    GINT_EnableCallback(GINT0);
+~~~~~
+*/

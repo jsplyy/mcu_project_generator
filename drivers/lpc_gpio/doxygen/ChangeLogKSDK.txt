@@ -1,0 +1,6 @@
+/*!
+@page driver_log Driver Change Log
+
+@section gpio GPIO
+  Current GPIO driver version is 2.0.0
+*/

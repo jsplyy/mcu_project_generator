@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.aes.support" requires="devices.LPC54S608"/>
+    <component description="AES Driver" name="platform.drivers.aes" provides="platform.drivers" requires="platform.drivers.aes.support platform.drivers.common" type="driver" version="2.0.0" full_name= "AES Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_aes.h"/>
+        <files mask="fsl_aes.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

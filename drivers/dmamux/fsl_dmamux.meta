@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.dmamux.support" requires="devices.modules.DriverType_DMAMUX"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_SYN_034"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_SYN_031"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_SYN_022"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_SYN_028"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_SYN_030"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_SYN_032"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_SYN_033"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_SYN_029"/>
+    <component name="platform.drivers.dmamux.support.ip" requires="devices.modules.D_IP_DMA_CH_MUX_32BIT_SYN_002"/>
+    <component description="DMAMUX Driver" name="platform.drivers.dmamux" provides="platform.drivers" requires="platform.drivers.dmamux.support platform.drivers.common" type="driver" version="2.0.2" change_log="./doxygen/ChangeLogKSDK.txt" full_name="DMAMUX Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_dmamux.c" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_dmamux.h" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_dmamux.c" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_dmamux.h" requires="platform.drivers.edma"/>
+      </source>
+    </component>
+  </components>
+</metadata>

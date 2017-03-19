@@ -1,0 +1,27 @@
+/*!
+@defgroup gpio GPIO: General-Purpose Input/Output Driver
+
+*/
+
+/*!
+@defgroup gpio_driver GPIO Driver
+@ingroup gpio
+@details The KSDK provides a peripheral driver for the General-Purpose Input/Output (GPIO)
+module of Kinetis devices.
+
+# Typical use case {#GPIOTpyUC}
+
+## Input Operation {#GPIOInOps}
+
+~~~~~{.c}
+    /*  Input pin configuration */
+    EnableIRQ(EXAMPLE_SW_IRQ);
+    gpio_pin_config_t sw_config = {
+        kGPIO_DigitalInput, 0,
+        kGPIO_IntRisingEdge,
+    };
+    /* Sets the input pin configuration */
+    GPIO_PinInit(EXAMPLE_SW_GPIO, EXAMPLE_SW_GPIO_PIN, &sw_config);
+~~~~~
+*/
+

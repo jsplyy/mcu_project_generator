@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.rtc.support" requires="devices.modules.DriverType_QN_RTC"/>
+    <component description="RTC Driver" name="platform.drivers.qn_rtc" provides="platform.drivers" requires="platform.drivers.rtc.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_rtc.c"/>
+        <files mask="fsl_rtc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>
+

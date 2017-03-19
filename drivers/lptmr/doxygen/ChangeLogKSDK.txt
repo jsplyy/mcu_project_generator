@@ -1,0 +1,14 @@
+/*!
+@page driver_log Driver Change Log
+
+@section lptmr LPTMR
+  Current LPTMR driver version is 2.0.1
+
+  - 2.0.0
+    - Initial version.
+  - 2.0.1
+    - Driver update:
+      - Update LPTMR driver due to the register LPTMRx_CMR/CNR in some devices become 32bit,
+        so that update LPTMR driver to support the 32 bit CNR and CMR register.
+
+*/

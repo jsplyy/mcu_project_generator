@@ -1,0 +1,155 @@
+/*!
+@page drv_err Driver errors status
+ - #kStatus_ESAI_TxBusy = 6900
+ - #kStatus_ESAI_RxBusy = 6901
+ - #kStatus_ESAI_TxError = 6902
+ - #kStatus_ESAI_RxError = 6903
+ - #kStatus_ESAI_QueueFull = 6904
+ - #kStatus_ESAI_TxIdle = 6905
+ - #kStatus_ESAI_RxIdle = 6906
+*/
+
+/*!
+@defgroup esai ESAI: Enhanced Serial Audio Interface
+@details The KSDK provides a peripheral driver for the Enhanced Serial Audio Interface (ESAI)
+         module of Kinetis devices.
+
+
+ESAI driver includes functional APIs and transactional APIs.
+
+Functional APIs are feature/property target low-level APIs.
+Functional APIs can be used for ESAI initialization/configuration/operation for
+optimization/customization purpose. Using the functional API requires the
+knowledge of the ESAI peripheral and how to organize functional APIs to
+meet the application requirements. All functional API use the peripheral base
+address as the first parameter. ESAI functional operation groups provide the
+functional API set.
+
+Transactional APIs are transaction target high-level APIs.
+Transactional APIs can be used to enable the peripheral and in the
+application if the code size and performance of transactional APIs satisfy the
+requirements. If the code size and performance are a critical requirement,
+see the transactional API implementation and write a custom code. All
+transactional APIs use the esai_handle_t as the first parameter.
+Initialize the handle by calling the ESAI_TransferTxCreateHandle() or ESAI_TransferRxCreateHandle() API.
+
+Transactional APIs support asynchronous transfer. This means that the functions
+ESAI_TransferSendNonBlocking() and ESAI_TransferReceiveNonBlocking() set up the interrupt for data
+transfer. When the transfer completes, the upper layer is notified through a callback
+function with the kStatus_ESAI_TxIdle and kStatus_ESAI_RxIdle status.
+
+# Typical use case {#ESAICase}
+
+## ESAI Send/Receive using an interrupt method {#ESAICaseInterrupt}
+
+~~~~~{.c}
+    esai_handle_t g_esaiTxHandle;
+    esai_config_t user_config;
+    esai_transfer_t sendXfer;
+    volatile bool txFinished;
+    volatile bool rxFinished;
+    const uint8_t sendData[] = [......];
+
+    void ESAI_UserCallback(esai_handle_t *handle, status_t status, void *userData)
+    {
+        userData = userData;
+
+        if (kStatus_ESAI_TxIdle == status)
+        {
+            txFinished = true;
+        }
+    }
+
+    void main(void)
+    {
+        //...
+
+        ESAI_TxGetDefaultConfig(&user_config);
+
+        ESAI_TxInit(ESAI0, &user_config);
+        ESAI_TransferTxCreateHandle(ESAI0, &g_esaiHandle, ESAI_UserCallback, NULL);
+
+        //Configure esai format
+        ESAI_TransferTxSetTransferFormat(ESAI0, &g_esaiHandle, mclkSource, mclk);
+
+        // Prepare to send.
+        sendXfer.data = sendData
+        sendXfer.dataSize = sizeof(sendData)/sizeof(sendData[0]);
+        txFinished = false;
+
+        // Send out.
+        ESAI_TransferSendNonBlocking(ESAI0, &g_esaiHandle, &sendXfer);
+
+        // Wait send finished.
+        while (!txFinished)
+        {
+        }
+
+        // ...
+    }
+~~~~~
+
+## ESAI Send/receive using a DMA method {#ESAICaseDma}
+
+~~~~~{.c}
+    esai_handle_t g_esaiHandle;
+    dma_handle_t g_esaiTxDmaHandle;
+    dma_handle_t g_esaiRxDmaHandle;
+    esai_config_t user_config;
+    esai_transfer_t sendXfer;
+    volatile bool txFinished;
+    uint8_t sendData[] = ...;
+
+    void ESAI_UserCallback(esai_handle_t *handle, status_t status, void *userData)
+    {
+        userData = userData;
+
+        if (kStatus_ESAI_TxIdle == status)
+        {
+            txFinished = true;
+        }
+    }
+
+    void main(void)
+    {
+        //...
+
+        ESAI_TxGetDefaultConfig(&user_config);
+        ESAI_TxInit(ESAI0, &user_config);
+
+        // Sets up the DMA.
+        DMAMUX_Init(DMAMUX0);
+        DMAMUX_SetSource(DMAMUX0, ESAI_TX_DMA_CHANNEL, ESAI_TX_DMA_REQUEST);
+        DMAMUX_EnableChannel(DMAMUX0, ESAI_TX_DMA_CHANNEL);
+
+        DMA_Init(DMA0);
+
+        /* Creates the DMA handle. */
+        DMA_CreateHandle(&g_esaiTxDmaHandle, DMA0, ESAI_TX_DMA_CHANNEL);
+
+        ESAI_TransferTxCreateHandleDMA(ESAI0, &g_esaiTxDmaHandle, ESAI_UserCallback, NULL);
+
+        // Prepares to send.
+        sendXfer.data = sendData
+        sendXfer.dataSize = sizeof(sendData)/sizeof(sendData[0]);
+        txFinished = false;
+
+        // Sends out.
+        ESAI_TransferSendDMA(&g_esaiHandle, &sendXfer);
+
+        // Waits for send to complete.
+        while (!txFinished)
+        {
+        }
+
+        // ...
+    }
+~~~~~
+
+
+*/
+
+/*!
+@defgroup eesai_edma ESAI eDMA Driver
+@ingroup esai
+*/

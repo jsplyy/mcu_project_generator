@@ -1,0 +1,32 @@
+/*!
+@defgroup fmc FMC: Hardware flash signature generator
+@details The KSDK provides a peripheral driver for the Flash Signature generator module of LPC devices.
+
+The flash module contains a built-in signature generator. This generator can produce a 128-bit signature from a range of flash memory.
+A typical usage is to verify the flashed contents against a calculated signature (e.g. during programming). The signature
+generator can also be accessed via an IAP function call or ISP command.
+
+
+# Generate flash signature {#GenerateFlashSig}
+<ol>
+<li>FMC_GenerateFlashSignature() function generates flash signature for a specified address range.</li>
+</ol>
+
+This example code shows how to generate 128-bit flash signature using the FMC driver.
+
+~~~~~{.c}
+{
+    fmc_config_t config;
+    fmc_flash_signature_t hardSignature;
+
+    FMC_GetDefaultConfig(&config);
+    FMC_Init(FMC, &config);
+
+    FMC_GenerateFlashSignature(FMC, startAddress, length, &hardSignature);
+    
+    /* print data. */
+    
+    PRINTF(" Generate hardware signature: 0x%x %x %x %x\r\n", hardSignature.word3, hardSignature.word2, hardSignature.word1, hardSignature.word0);
+}
+~~~~~
+*/

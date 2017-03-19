@@ -1,0 +1,21 @@
+/*!
+@page driver_log Driver Change Log
+
+@section enet ENET
+  Current enet driver version is 2.1.1
+
+  - 2.0.0
+    - Initial version.
+  - 2.0.1
+    - Bug Fix:
+      - Use direct transmit busy check when do data transmit.
+    - Misc Changes:
+      - Update IRQ handler work flow.
+      - Change the tx/rx interrupt macro from kENET_RxByteInterrupt to kENET_RxBufferInterrupt, from kENET_TxByteInterrupt to kENET_TxBufferInterrupt.
+      - Delete unnecessary parameter in ENET handler.
+  - 2.1.1
+    - Add the extended MDIO IEEE802.3 Clause 45 MDIO format SMI command APIs
+    - Add the extended interrupt coalescing feature.
+    - combine all storage operations in the ENET_Init to ENET_SetHandler API
+
+*/

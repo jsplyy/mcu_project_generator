@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.pmu.support" requires="devices.modules.DriverType_PMU"/>
+    <component description="pmu Driver" name="platform.drivers.pmu" provides="platform.drivers" requires="platform.drivers.pmu.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_pmu.c"/>
+        <files mask="fsl_pmu.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

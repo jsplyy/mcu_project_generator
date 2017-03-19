@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.iocon.support" requires="devices.modules.DriverType_LPC_IOCON"/>
+    <component description="IOCON Driver" name="platform.drivers.lpc_iocon" provides="platform.drivers" requires="platform.drivers.iocon.support platform.drivers.common" type="driver" version="2.0.0" full_name= "IOCON Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_iocon.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

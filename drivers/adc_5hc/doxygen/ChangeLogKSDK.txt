@@ -1,0 +1,11 @@
+/*!
+@page driver_log Driver Change Log
+
+@section adc_5hc ADC_5HC
+  Current ADC_5HC driver version is 2.0.0
+
+  - 2.0.0
+    - Initial version.
+    - This module is developed firstly on I.mx6ull.
+
+*/

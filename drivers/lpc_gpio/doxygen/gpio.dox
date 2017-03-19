@@ -1,0 +1,91 @@
+/*!
+@defgroup lpc_gpio GPIO: General Purpose I/O
+
+@details The SDK provides Peripheral driver for the General Purpose I/O (GPIO) module of
+         LPC devices.
+
+# Function groups {#GPIOFuncGrps}
+
+## Initialization and deinitialization {#GPIOInit}
+The function GPIO_PinInit() initializes the GPIO with specified configuration.
+
+## Pin manipulation {#GPIOPinManipulation}
+The function GPIO_WritePinOutput() set output state of selected GPIO pin.
+The function GPIO_ReadPinInput() read input value of selected GPIO pin.
+
+## Port manipulation {#GPIOPortManipulation}
+The function GPIO_SetPinsOutput() sets the output level of selected GPIO pins to the logic 1.
+The function GPIO_ClearPinsOutput() sets the output level of selected GPIO pins to the logic 1.
+The function GPIO_TogglePinsOutput() reverse the output level of selected GPIO pins.
+The function GPIO_ReadPinsInput() read input value of selected port.
+
+## Port masking {#GPIOPortMasking}
+The function GPIO_SetPortMask() set port mask, only pins masked by 0 will be enabled in following functions.
+The function GPIO_WriteMPort()  sets the state of selected GPIO port, only pins masked by 0 will be affected.
+The function GPIO_ReadMPort() reads the state of selected GPIO port, only pins masked by 0 are enabled for read, pins masked by 1 are read as 0.
+
+# Typical use case {#GPIOTpyUC}
+Example use of GPIO API.
+~~~~~{.c}
+int main(void)
+{
+    uint32_t port_state = 0;
+
+    /* Define the init structure for the output LED pin*/
+    gpio_pin_config_t led_config = {
+        kGPIO_DigitalOutput, 0,
+    };
+
+    /* Board pin, clock, debug console init */
+    BOARD_InitHardware();
+
+
+    /* Init output LED GPIO. */
+    GPIO_PinInit(GPIO, BOARD_LED_GREEN_GPIO_PORT, BOARD_LED_GREEN_GPIO_PIN, &led_config);
+    GPIO_WritePinOutput(GPIO, BOARD_LED_GREEN_GPIO_PORT, BOARD_LED_GREEN_GPIO_PIN, 1);
+
+    GPIO_PinInit(GPIO, BOARD_LED_GPIO_PORT, BOARD_LED_GPIO_PIN, &led_config);
+    GPIO_WritePinOutput(GPIO, BOARD_LED_GPIO_PORT, BOARD_LED_GPIO_PIN, 1);
+
+    GPIO_PinInit(GPIO, BOARD_LED_BLUE_GPIO_PORT, BOARD_LED_BLUE_GPIO_PIN, &led_config);
+    GPIO_WritePinOutput(GPIO, BOARD_LED_BLUE_GPIO_PORT, BOARD_LED_BLUE_GPIO_PIN, 1);
+
+    GPIO_ClearPinsOutput(GPIO, 1, 1 << BOARD_LED_GREEN_GPIO_PIN | 1 << BOARD_LED_BLUE_GPIO_PIN);
+    GPIO_SetPinsOutput(GPIO, 1, 1 << BOARD_LED_GREEN_GPIO_PIN | 1 << BOARD_LED_BLUE_GPIO_PIN);
+
+    GPIO_ClearPinsOutput(GPIO, 1, 1 << BOARD_LED_BLUE_GPIO_PIN);
+    GPIO_SetPinsOutput(GPIO, 1, 1 << BOARD_LED_BLUE_GPIO_PIN);
+
+    GPIO_TogglePinsOutput(GPIO, 1, 1 << BOARD_LED_GREEN_GPIO_PIN | 1 << BOARD_LED_BLUE_GPIO_PIN);
+    GPIO_TogglePinsOutput(GPIO, 1, 1 << BOARD_LED_GREEN_GPIO_PIN | 1 << BOARD_LED_BLUE_GPIO_PIN);
+
+    GPIO_TogglePinsOutput(GPIO, 1, 1 << BOARD_LED_GREEN_GPIO_PIN);
+    GPIO_TogglePinsOutput(GPIO, 1, 1 << BOARD_LED_GREEN_GPIO_PIN);
+
+    GPIO_TogglePinsOutput(GPIO, BOARD_LED_GPIO_PORT, 1 << BOARD_LED_GPIO_PIN);
+    GPIO_TogglePinsOutput(GPIO, BOARD_LED_GPIO_PORT, 1 << BOARD_LED_GPIO_PIN);
+
+    /* Port masking */
+    GPIO_SetPortMask(GPIO, BOARD_LED_GPIO_PORT, 0x0000ffff);
+    GPIO_WriteMPort(GPIO, BOARD_LED_GPIO_PORT, 0xffffffff);
+    port_state = GPIO_ReadPinsInput(GPIO, 0);
+    port_state = GPIO_ReadMPort(GPIO, 0);
+
+    while (1)
+    {
+        port_state = GPIO_ReadPinsInput(GPIO, 0);
+        if (!(port_state & (1 << BOARD_SW1_GPIO_PIN)))
+        {
+            GPIO_TogglePinsOutput(GPIO, BOARD_LED_GPIO_PORT, 1u << BOARD_LED_GPIO_PIN);
+        }
+
+        if (!GPIO_ReadPinInput(GPIO, BOARD_SW2_GPIO_PORT, BOARD_SW2_GPIO_PIN))
+        {
+            GPIO_TogglePinsOutput(GPIO, BOARD_LED_GREEN_GPIO_PORT, 1u << BOARD_LED_GREEN_GPIO_PIN);
+        }
+        delay();
+    }
+}
+~~~~~
+*/
+

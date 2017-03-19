@@ -1,0 +1,29 @@
+/*!
+@page driver_log Driver Change Log
+
+@section uart UART
+  Current UART driver version is 2.1.4
+
+  - 2.0.0
+    - Initial version.
+
+  - 2.1.0
+    - Add transactional API.
+
+  - 2.1.1
+    - Remove needless check of event flags and assert in UART_RTOS_Receive.
+    - Wait always for rx event flag in UART_RTOS_Receive.
+
+  - 2.1.2
+    - Fix baud rate fine adjust bug to make the computed baud rate more accurately.
+
+  - 2.1.3
+    - Add rx framing error and parity error status check when use interrupt transfer.
+
+  - 2.1.4
+    - Change parameter type in UART_RTOS_Init() struct rtos_uart_config --> uart_rtos_config_t.
+    - Bug fixed:
+      - Disable UART receive interrupt instead of disable all NVIC when read data from ring buffer. 
+        Because with ring buffer used, receive nonblocking will disable all NVIC interrupts to protect 
+        the ring buffer, this will have negative effect to other IPS which are using interrupt.
+*/

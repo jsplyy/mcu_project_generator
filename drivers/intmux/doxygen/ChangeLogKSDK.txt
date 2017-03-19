@@ -1,0 +1,13 @@
+/*!
+@page driver_log Driver Change Log
+
+@section intmux INTMUX
+  Current INTMUX driver version is 2.0.1
+
+  - 2.0.0
+    - Initial version.
+  - 2.0.1
+    - Improvement:
+      - Add pubweak DriverIRQHandler for K32W042S1M2 which only has INTMUX1 with 8 channels.
+
+*/

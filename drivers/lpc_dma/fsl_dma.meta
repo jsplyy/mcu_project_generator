@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.lpc_dma.support" requires="devices.modules.DriverType_LPC_DMA"/>
+    <component description="DMA Driver" name="platform.drivers.lpc_dma" provides="platform.drivers" requires="platform.drivers.lpc_dma.support platform.drivers.common" type="driver" version="1.0.0" full_name= "DMA Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_dma.c"/>
+        <files mask="fsl_dma.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

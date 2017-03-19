@@ -1,0 +1,90 @@
+/*!
+@defgroup  adc_5hc_12b1msps_sar ADC_5HC: 12-bit Analog to Digital Converter Driver
+@details The SDK provides Peripheral driver for the 12-bit Analog to Digital Converter (ADC_5HC) 
+         module of Kinetis devices.
+
+# Typical use case {#ADCTpyUC}
+
+## Polling Configuration {#ADCIntConfig}
+
+~~~~~{.c}
+    volatile bool g_AdcConversionDoneFlag;
+    volatile uint32_t g_AdcConversionValue;
+    volatile uint32_t g_AdcInterruptCounter;
+
+    // ...
+    
+    adc_5hc_config_t adcConfigStrcut;
+    adc_5hc_channel_config_t adcChannelConfigStruct;
+
+    ADC_5HC_GetDefaultConfig(&adcConfigStrcut);
+    ADC_5HC_Init(DEMO_ADC_5HC_BASE, &adcConfigStrcut);
+    ADC_5HC_EnableHardwareTrigger(DEMO_ADC_5HC_BASE, false);
+    if (kStatus_Success == ADC_5HC_DoAutoCalibration(DEMO_ADC_5HC_BASE))
+    {
+        PRINTF("ADC_5HC_DoAntoCalibration() Done.\r\n");
+    }
+    else
+    {
+        PRINTF("ADC_5HC_DoAutoCalibration() Failed.\r\n");
+    }
+    adcChannelConfigStruct.channelNumber = DEMO_ADC_5HC_USER_CHANNEL;
+    adcChannelConfigStruct.enableInterruptOnConversionCompleted = true;
+    g_AdcInterruptCounter = 0U;
+    
+    while (1)
+    {
+        PRINTF("Press any key to get user channel's ADC_5HC value.\r\n");
+        GETCHAR();
+        g_AdcConversionDoneFlag = false;
+        ADC_5HC_SetChannelConfig(DEMO_ADC_5HC_BASE, DEMO_ADC_5HC_CHANNEL_GROUP, &adcChannelConfigStruct);
+        while (g_AdcConversionDoneFlag == false)
+        {
+        }
+        PRINTF("ADC_5HC Value: %d\r\n", g_AdcConversionValue);
+        PRINTF("ADC_5HC Interrupt Counter: %d\r\n", g_AdcInterruptCounter);
+    }
+
+    // ...
+    
+    void DEMO_ADC_5HC_IRQ_HANDLER_FUNC(void)
+    {
+        g_AdcConversionDoneFlag = true;
+        g_AdcConversionValue = ADC_5HC_GetChannelConversionValue(DEMO_ADC_5HC_BASE, DEMO_ADC_5HC_CHANNEL_GROUP);
+        g_AdcInterruptCounter++;
+    }
+~~~~~
+
+## Polling Configuration {#ADCPolConfig}
+
+~~~~~{.c}
+    adc_5hc_config_t adcConfigStrcut;
+    adc_5hc_channel_config_t adcChannelConfigStruct;
+    
+    ADC_5HC_GetDefaultConfig(&adcConfigStrcut);
+    ADC_5HC_Init(DEMO_ADC_5HC_BASE, &adcConfigStrcut);
+    ADC_5HC_EnableHardwareTrigger(DEMO_ADC_5HC_BASE, false);
+    if (KStatus_Success == ADC_5HC_DoAutoCalibration(DEMO_ADC_5HC_BASE))
+    {
+        PRINTF("ADC_5HC_DoAntoCalibration() Done.\r\n");
+    }
+    else
+    {
+        PRINTF("ADC_5HC_DoAutoCalibration() Failed.\r\n");
+    }
+    adcChannelConfigStruct.channelNumber = DEMO_ADC_5HC_USER_CHANNEL;
+    adcChannelConfigStruct.enableInterruptOnConversionCompleted = false;
+
+    while (1)
+    {
+        PRINTF("Press any key to get user channel's ADC_5HC value.\r\n");
+        GETCHAR();
+        ADC_5HC_SetChannelConfig(DEMO_ADC_5HC_BASE, DEMO_ADC_5HC_CHANNEL_GROUP, &adcChannelConfigStruct);
+        while (0U == ADC_5HC_GetChannelStatusFlags(DEMO_ADC_5HC_BASE, DEMO_ADC_5HC_CHANNEL_GROUP))
+        {
+        }
+        PRINTF("ADC_5HC Value: %d\r\n", ADC_5HC_GetChannelConversionValue(DEMO_ADC_5HC_BASE, DEMO_ADC_5HC_CHANNEL_GROUP));
+    }
+~~~~~
+
+*/

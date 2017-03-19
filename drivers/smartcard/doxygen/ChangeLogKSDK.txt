@@ -1,0 +1,30 @@
+/*!
+@page driver_log Driver Change Log
+
+@section smartcard SMARTCARD
+    Current SMARTCARD driver version is 2.2.0
+
+    - 2.1.0
+        - Initial version
+
+    - 2.1.1
+        - New Features:
+            - added default phy interface selection into smartcard RTOS drivers (KPSDK-9063).
+            - replaced smartcard_phy_ncn8025 driver by smartcard_phy_tda8035.
+        - Bug Fix:
+            - fixed protocol timers activation sequences in smartcard_emvsim and smartcard_phy_tda8035
+              drivers during emvl1 pre-certification tests (KPSDK-9170, KPSDK-9556).
+
+    - 2.1.2
+        - Is need provide time delay function which works in microseconds
+        - Bug Fix:
+            - changed event to semaphore in RTOS driver (KPSDK-11634)
+            - added check if de-initialized variables are not null in SMARTCARD_RTOS_Deinit() (KPSDK-8788)
+            - changed deactivation sequence in SMARTCARD_PHY_TDA8035_Deactivate() to properly stop the clock (POSCR-35)
+            - fixed timing issue with VSEL0/1 signals in smartcard TDA8035 driver (KPSDK-10160)
+
+    - 2.2.0
+        - New Features:
+            - updated to use rx/tx FIFO
+
+*/

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.wwdt.support" requires="devices.modules.DriverType_LPC_WWDT"/>
+    <component description="WWDT Driver" name="platform.drivers.wwdt" provides="platform.drivers" requires="platform.drivers.wwdt.support platform.drivers.common" type="driver" version="2.0.0" full_name= "WWDT Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_wwdt.c"/>
+        <files mask="fsl_wwdt.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

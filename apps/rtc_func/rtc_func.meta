@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<metadata>
+  <components>
+    <component name="boards.frdmk64f.demo_apps.rtc_func" manifest_external="./rtc_func.xml" requires="platform.drivers.uart platform.drivers.rtc platform.drivers.port platform.drivers.gpio platform.drivers.common platform.utilities.debug_console platform.devices.MK64F12_CMSIS platform.drivers.smc platform.drivers.flash platform.drivers.clock platform.devices.MK64F12_startup devices.boards.frdmk64f" provides="examples.board.demo_apps">
+      <source path="./">
+        <files mask="*.txt"/>
+        <files mask="*.c"/>
+        <files mask="*.h"/>
+        <files mask="*.meta"/>
+        <files mask="*.bin"/>
+        <files mask="*.xml"/>
+      </source>
+      <source path="./iar/" requires="iar">
+        <files mask="*.*"/>
+      </source>
+      <source path="./iar/settings/" requires="iar">
+        <files mask="*.*"/>
+      </source>
+      <source path="./mdk/" requires="mdk">
+        <files mask="*.*"/>
+      </source>
+      <source path="./armgcc/" requires="armgcc">
+        <files mask="*.*"/>
+      </source>
+      <source path="./kds/" requires="kds">
+        <files mask="*.*"/>
+      </source>
+      <source path="./kds/settings/" requires="kds">
+        <files mask="*.*"/>
+      </source>
+      <source path="./mcux/" requires="mcuxpresso">
+        <files mask="*.*"/>
+      </source>
+    </component>
+  </components>
+</metadata>

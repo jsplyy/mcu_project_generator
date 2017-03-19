@@ -1,0 +1,21 @@
+/*!
+@page driver_log Driver Change Log
+
+@section spi SPI
+  Current SPI driver version is 2.0.1
+
+  - 2.0.0
+    - Initial version.
+  - 2.0.1
+    - Bug fix:
+      - Fix SPI_Enable function parameter error.
+      - Set the s_dummy variable as static variable in fsl_spi_dma.c
+    - Optimazation:
+      - Optimize the code size while not use transactional API.
+      - Improve performance in polling method.
+      - Add #ifndef/#endif to allow user to change the default tx value at compile time.
+  - 2.0.2
+    - New feature:
+      - Allow user to set the transfer size for SPI_TransferNoBlocking non-integer times of watermark.
+      - Allow user to define the dummy data, users only need to define the macro SPI_DUMMYDATA in applications.
+*/

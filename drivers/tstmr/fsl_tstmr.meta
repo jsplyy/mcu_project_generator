@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.tstmr.support" requires="devices.modules.DriverType_TSTMR"/>
+    <component name="platform.drivers.tstmr.support.ip" requires="devices.modules.D_SSL_L5K_SIM_SYN_012"/>
+    <component description="TSTMR Driver" name="platform.drivers.tstmr" provides="platform.drivers" requires="platform.drivers.tstmr.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "TSTMR Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_tstmr.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

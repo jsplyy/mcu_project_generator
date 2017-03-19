@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.ctimer.support.timer" provides="platform.drivers.ctimer.support" requires="devices.modules.DriverType_LPC_TIMER"/>
+    <component name="platform.drivers.ctimer.support.ctimer" provides="platform.drivers.ctimer.support" requires="devices.modules.DriverType_LPC_CTIMER"/>
+    <component description="CTimer Driver" name="platform.drivers.ctimer" provides="platform.drivers" requires="platform.drivers.ctimer.support platform.drivers.common" type="driver" version="2.0.0" full_name= "CTimer Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_ctimer.c"/>
+        <files mask="fsl_ctimer.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

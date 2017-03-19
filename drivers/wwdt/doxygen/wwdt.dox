@@ -1,0 +1,75 @@
+/*!
+@defgroup wwdt WWDT: Windowed Watchdog Timer Driver
+@details The SDK provides a peripheral driver for the Watchdog module (WDOG) of LPC devices.
+
+# Function groups {#WWDTFunc}
+
+## Initialization and deinitialization {#WWDTInit}
+The function WWDT_Init() initializes the watchdog timer with specified configurations. The configurations
+include timeout value and whether to enable watchdog after iniy. The function WWDT_GetDefaultConfig()
+gets the default configurations.
+
+The function WWDT_Deinit() disables the watchdog and the module clock.
+
+## Status {#WWDTStatus}
+Provides functions to get and clear the WWDT status.
+
+## Interrupt {#WWDTInterrupt}
+Provides functions to enable/disable WWDT interrupts and get current enabled interrupts.
+
+## Watch dog Refresh {#WWDTRefresh}
+The function WWDT_Refresh() feeds the WWDT.
+
+
+# Typical use case {#WWDTTypUC}
+~~~~~{.c}
+int main(void)
+{
+    wwdt_config_t config;
+    uint32_t wdtFreq;
+
+    /* Init hardware*/
+    BOARD_InitHardware();
+
+    /* Set Red LED to initially be high */
+    LED_RED_INIT(1);
+
+    POWER_DisablePD(kPDRUNCFG_PD_WDT_OSC);
+
+    /* The WDT divides the input frequency into it by 4 */
+    wdtFreq = CLOCK_GetFreq(kClock_WdtOsc) / 4;
+
+    NVIC_EnableIRQ(WDT_BOD_IRQn);
+
+    WWDT_GetDefaultConfig(&config);
+
+    /* Check if reset is due to Watchdog */
+    if (WWDT_GetStatusFlags(WWDT) & kWWDT_TimeoutFlag) {
+        LED_RED_ON();
+        PRINTF("Watchdog reset occurred\r\n");
+    }
+
+    /*
+     * Set watchdog feed time constant to approximately 2s
+     * Set watchdog warning time to 512 ticks after feed time constant
+     * Set watchdog window time to 1s
+     */
+    config.timeoutValue = wdtFreq * 2;
+    config.warningValue = 512;
+    config.windowValue = wdtFreq * 1;
+    /* Configure WWDT to reset on timeout */
+    config.enableWatchdogReset = true;
+
+    /* wdog refresh test in window mode */
+    PRINTF("\r\n--- Window mode refresh test start---\r\n");
+    WWDT_Init(WWDT, &config);
+
+    /* First feed will start the watchdog */
+    WWDT_Refresh(WWDT);
+
+    while (1)
+    {
+    }
+}
+~~~~~
+*/

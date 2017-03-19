@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.spi.support" requires="devices.modules.DriverType_SPI"/>
+    <component name="platform.drivers.spi.support.ip" requires="devices.modules.D_IP_SPI_SYN_023"/>
+    <component name="platform.drivers.spi.support.ip" requires="devices.modules.D_IP_SPI_SYN_026"/>
+    <component name="platform.drivers.spi.support.ip" requires="devices.modules.D_IP_SPI16_FIFO_SYN_009"/>
+    <component name="platform.drivers.spi.support.ip" requires="devices.modules.D_IP_SPI16_SYN_010"/>
+    <component name="platform.drivers.spi.support.ip" requires="devices.modules.D_IP_SPI16_SYN_008"/>
+    <component name="platform.drivers.spi.support.ip" requires="devices.modules.D_IP_SPI_SYN_019"/>
+    <component description="SPI Driver" name="platform.drivers.spi" provides="platform.drivers" requires="platform.drivers.spi.support platform.drivers.common" type="driver" version="2.0.2" change_log="./doxygen/ChangeLogKSDK.txt" full_name="SPI Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_spi.c"/>
+        <files mask="fsl_spi.h"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_spi_dma.c" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_spi_dma.h" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_spi_freertos.c" requires="middleware.freertos"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_spi_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

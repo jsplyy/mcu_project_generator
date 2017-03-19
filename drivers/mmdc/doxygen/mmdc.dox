@@ -1,0 +1,102 @@
+/*!
+@defgroup mmdc MMDC: Multi Mode DDR Controller Driver
+@details The KSDK provides a peripheral driver for the Multi Mode DDR Controller
+ block of Kinetis devices.
+
+The MMDC is configurable high performance and optimized DDR controller that support LPDDR2 x16 memory type.
+The MMDC driver provide function API to  config the MMDC core and PHY register.
+
+# Typical use case {#MMDCTpyUC}
+This example shows how to use the MMDC driver to
+initialize the external 16 bit DDR device.
+Initialize the MMDC controller and run the initialization sequence. The external DDR device is initialized and the DDR read and write is available.
+
+Initialize the LPDDR2 Controller and external device.
+~~~~~{.c}
+
+      mmdc_config_t config;
+    mmdc_basic_config_t basicConfig;
+    mmdc_auto_refresh_t autoRefresh;
+    mmdc_power_config_t pwr;
+    mmdc_calibration_config_t cal;
+    mmdc_zq_config_t zq;
+
+    /* user can new a global mmdc_lpddr2_timing_t to save the timing when change freq */
+    mmdc_lpddr2_timing_t lpddr2Timing;
+
+    /* reset all structure */
+    memset(&config, 0U, sizeof(mmdc_config_t));
+    memset(&basicConfig, 0U, sizeof(mmdc_basic_config_t));
+    memset(&pwr, 0U, sizeof(mmdc_power_config_t));
+    memset(&cal, 0U, sizeof(mmdc_calibration_config_t));
+    memset(&zq, 0U, sizeof(mmdc_zq_config_t));
+    memset(&lpddr2Timing, 0U, sizeof(mmdc_lpddr2_timing_t));
+
+    /* Init the MMDC CONFIG structure
+    * pointer to the device init function
+    * set the bus clock
+    * assign the dev/misc pointer
+    */
+    config.busFreq_HZ = busClock_Hz;
+    config.basicConfig = &basicConfig;
+
+    /*
+    * init the device structure
+    */
+    basicConfig.deviceFreq_HZ = busClock_Hz;
+    basicConfig.deviceSize = LPDDR2_DEVICE_SIZE;
+    basicConfig.devType = LPDDR2_DEVICE_TYPE;
+    basicConfig.devBank = LPDDR2_DEVICE_BANK;
+    basicConfig.rowWidth = LPDDR2_DEVICE_ROW_WIDTH;
+    basicConfig.colWidth = LPDDR2_DEVICE_COL_WIDTH;
+    basicConfig.burstLen = LPDDR2_DEVICE_BURST_LEN;
+
+    /* auto fresh scheme config */
+    autoRefresh.refreshCnt = LPDDR2_REFRESH_CNT;
+    autoRefresh.refreshRate = LPDDR2_REFRESH_RATE;
+    autoRefresh.refreshTrigSrc = LPDDR2_REFRESH_TRIGGER_SRC;
+
+    basicConfig.autoRefresh = &autoRefresh;
+    basicConfig.power = &pwr;
+    basicConfig.cal = &cal;
+    basicConfig.zq = &zq;
+    basicConfig.timing = &lpddr2Timing;
+
+    /* get the default config of timing/ZQ/PWR */
+    MMDC_GetDefaultConfig(&config);
+
+    /* init the module */
+    errorCheck = MMDC_Init(base, &config);
+
+    cal.rMode = kMMDC_CalWithPreDefine;
+    cal.wMode = kMMDC_CalWithPreDefine;
+    /* do read/write calibration */
+    errorCheck = MMDC_DeviceCalibration(base, &basicConfig);
+
+    //optionally config the performance of the module
+    mmdc_performance_config_t per;
+    //config the detail here
+    MMDC_EnhancePerformace(base, &per);
+
+    //if your device is LPDDR2 , MMDC driver also provide a api to check the operating condition if need update
+    //check and analysis the return MR4 by youself
+    MR4 = MMDC_MonitorLPDDR2OperationTemp(base , &dev);
+    //update
+    MMDC_LPDDR2UpdateDerate(base , &dev, type);
+
+    //also provide a api to dynamic change the device frequency,user need restore the pre-freq timing structure by yourself, it will be useful when you revert the frequency , and user need to set the Mode register by yourself if needed such as update the CL/CWL , RTT_NOM,RTT_WR, DLL through MMDC_HandleCommand API.
+    MMDC_SetFrequency(base, &config, targetFreq);
+
+    //user can fine tuning the timing parameter when you want
+    //update the timing parameter
+    MMDC_ParameterFineTuning(base, &dev , type);
+
+    //user can manual send command ,this api can transfer serval cmd in once function call
+    mmdc_cmd_config_t cmdConfig[userdefine];
+    // config the array,must set the last struct field cmdEnd = true;
+    MMDC_HandleCommand(base , &cmdConfig);
+
+~~~~~
+
+
+*/

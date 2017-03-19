@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.dac12.support" requires="devices.modules.DriverType_DAC12"/>
+    <component description="DAC12 Driver" name="platform.drivers.dac12" provides="platform.drivers" requires="platform.drivers.dac12.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "DAC12 Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_dac12.c"/>
+        <files mask="fsl_dac12.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

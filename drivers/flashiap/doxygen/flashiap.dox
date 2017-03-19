@@ -1,0 +1,33 @@
+/*!
+@defgroup flashiap_driver FLASHIAP: Flash In Application Programming Driver
+@details The SDK provides a driver for the Flash In Application Programming (FLASHIAP).
+ @n
+It provides a set of functions to call the on chip in application flash programming interface. User code executing from on chip flash or ram can call these function to erase and write the flash memory.
+ @n
+
+
+# GFlash In Application Programming operation {#FLASHIAPInit}
+
+FLASHIAP_PrepareSectorForWrite() prepares a sector for write or erase operation.
+
+FLASHIAP_CopyRamToFlash() function programs the flash memory.
+
+FLASHIAP_EraseSector() function erase a flash sector. A sector must be erased before write operation.
+
+# Typical use case {#FLASHIAPTypUC}
+~~~~~{.c}
+    
+    /* Prepare sector before erase operation */
+    FLASHIAP_PrepareSectorForWrite(1, 1);
+
+	/* Erase sector 1 */
+    FLASHIAP_EraseSector(1, 1, SystemCoreClock);
+
+    /* Prepare sector before write operation */
+    FLASHIAP_PrepareSectorForWrite(1, 1);
+
+    /* Write sector 1  */
+    FLASHIAP_CopyRamToFlash(SECTOR_1_ADRESS, DATA_BUFFER_ADDRESS, NUM_OF_BYTES_TO_WRITE, SystemCoreClock);
+
+~~~~~
+*/

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.adc.support" requires="devices.modules.DriverType_QN_ADC"/>
+    <component description="ADC Driver" name="platform.drivers.qn_adc" provides="platform.drivers" requires="platform.drivers.adc.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_adc.c"/>
+        <files mask="fsl_adc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>
+

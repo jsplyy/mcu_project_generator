@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.pint.support" requires="devices.modules.DriverType_LPC_PINT"/>
+    <component description="PINT Driver" name="platform.drivers.pint" provides="platform.drivers" requires="platform.drivers.pint.support platform.drivers.common" type="driver" version="2.0.0" full_name= "PINT Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_pint.h"/>
+        <files mask="fsl_pint.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

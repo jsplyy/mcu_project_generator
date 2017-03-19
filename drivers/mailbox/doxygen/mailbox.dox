@@ -1,0 +1,78 @@
+/*!
+@defgroup mailbox Mailbox
+@details The SDK provides a peripheral driver for the Mailbox module of LPC devices.
+
+The mailbox driver API provide:
+    - init/deinit: MAILBOX_Init()/MAILBOX_Deinit()
+    - read/write from/to mailbox register: MAILBOX_SetValue()/MAILBOX_GetValue()
+    - set/clear mailbox register bits: MAILBOX_SetValueBits()/MAILBOX_ClearValueBits()
+    - get/set mutex: MAILBOX_GetMutex()/MAILBOX_SetMutex()
+
+# Typical use case {#MAILBOXTpyUC}
+## Example of code on primary core, which cause interrupt on secondary core by writing to mailbox register.
+
+~~~~~{.c}
+int main(void)
+{
+    /* Init Mailbox */
+    MAILBOX_Init(MAILBOX);
+    
+    uint32_t message = 1;
+    
+    /* Write message to CM0+ mailbox register - it causes interrupt on CM0+ core */
+    MAILBOX_SetValue(MAILBOX, kMAILBOX_CM0Plus, message);
+}
+~~~~~
+
+## Example of code on secondary core to handle interrupt from primary core.
+
+~~~~~{.c}
+void MAILBOX_IRQHandler()
+{
+    /* Read message from CM0+ mailbox register, sent by primary core */
+    uint32_t message;
+    message = MAILBOX_GetValue(MAILBOX, kMAILBOX_CM0Plus);
+
+    /* Clear mailbox CM0+ mailbox register */
+    MAILBOX_ClearValueBits(MAILBOX, kMAILBOX_CM0Plus, 0xffffffff);
+}
+
+int main(void)
+{
+    /* Init Mailbox */
+    MAILBOX_Init(MAILBOX);
+    
+    /* Enable mailbox interrupt */
+    NVIC_EnableIRQ(MAILBOX_IRQn);
+    
+    while (1)
+    {
+        __WFI();
+    }
+}
+~~~~~
+
+## Example of code to get/set mutex.
+
+~~~~~{.c}
+/* Shared variable by both cores */
+volatile uint32_t g_shared = 0;
+
+int main(void)
+{
+    /* Init Mailbox */
+    MAILBOX_Init(MAILBOX);
+
+    /* The core try get the mailbox mutex */
+    while (MAILBOX_GetMutex(MAILBOX) == 0)
+    {}
+
+    /* The core has mutex, can change shared variable g_shared */
+    g_shared++;
+
+    /* Set mutex to allow access other core to shared variable */
+    MAILBOX_SetMutex(MAILBOX);
+}
+~~~~~
+*/
+

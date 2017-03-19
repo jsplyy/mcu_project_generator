@@ -1,0 +1,17 @@
+/*
+@page driver_log Driver Change Log
+
+@section dryice DRYICE
+  Current DRYICE driver version is 2.0.0
+  
+  - 2.0.0
+    - Initial version.
+
+  - 2.0.1
+    - Add support for DRYICE feature macro
+      - FSL_FEATURE_DRYICE_HAS_SECURE_REGISTER_FILE_SELECT
+      - FSL_FEATURE_DRYICE_HAS_ACTIVE_TAMPER_CLOCK_SOURCE_SELECT
+      - FSL_FEATURE_DRYICE_HAS_TAMPER_PIN_SAMPLING
+      - FSL_FEATURE_DRYICE_HAS_TAMPER_PIN_PULL_SELECT
+
+*/

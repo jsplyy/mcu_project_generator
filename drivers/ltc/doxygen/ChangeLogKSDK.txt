@@ -1,0 +1,18 @@
+/*
+@page driver_log Driver Change Log
+
+@section ltc LTC
+  Current LTC driver version is 2.0.2
+  
+  - 2.0.0
+    - Initial version.
+    
+  - 2.0.1
+    - Bug fix:
+	  - Fix c++ build warning in block_to_ififo() functions
+      
+  - 2.0.2
+    - Bug fix:
+        - Fix [KPSDK-10932][LTC][SHA] LTC_HASH() blocks indefinitely when message size exceeds 4080 bytes
+
+*/

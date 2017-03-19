@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.msmc.support" requires="devices.modules.DriverType_MSMC"/>
+    <component name="platform.drivers.msmc.support" requires="devices.modules.DriverType_SMC"/>
+    <component name="platform.drivers.msmc.support.ip" requires="devices.modules.D_IP_MSMC_SYN_005"/>
+    <component description="MSMC Driver" name="platform.drivers.msmc" provides="platform.drivers" requires="platform.drivers.msmc.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "MSMC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_msmc.c"/>
+        <files mask="fsl_msmc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

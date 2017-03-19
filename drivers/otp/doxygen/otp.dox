@@ -1,0 +1,32 @@
+/*!
+@defgroup otp OTP: One-Time Programmable memory and API
+@details The KSDK provides a peripheral driver for the OTP module of LPC devices.
+
+Main clock has to be set to a frequency stated in user manual prior to using OTP driver.
+OTP memory is manipulated by calling provided API stored in ROM. KSDK driver encapsulates this.
+
+# OTP example {#OTPExample}
+
+This example shows how to write to OTP.
+
+~~~~~{.c}
+{
+	status_t status;
+
+    CLOCK_EnableClock(kCLOCK_Otp);
+
+	status = OTP_EnableBankWriteMask(kOTP_Bank3);
+    if (status != kStatus_Success)
+    {
+        return;
+    }
+
+    /* Unreversible operation */
+	status = OTP_ProgramRegister(3U, 1U, 0xA5A5U);
+    if (status != kStatus_Success)
+    {
+        return;
+    }
+}
+~~~~~
+*/

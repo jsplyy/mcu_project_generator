@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.sctimer.support" requires="devices.modules.DriverType_LPC_SCT"/>
+    <component description="SCT Driver" name="platform.drivers.sctimer" provides="platform.drivers" requires="platform.drivers.sctimer.support platform.drivers.common" type="driver" version="2.0.0" full_name= "SCT Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_sctimer.c"/>
+        <files mask="fsl_sctimer.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

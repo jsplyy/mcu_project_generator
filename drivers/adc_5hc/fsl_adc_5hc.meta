@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.adc_5hc.support" requires="devices.modules.DriverType_ADC_5HC"/>
+    <component description="ADC_5HC Driver" name="platform.drivers.adc_5hc" provides="platform.drivers" requires="platform.drivers.adc_5hc.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_adc_5hc.c"/>
+        <files mask="fsl_adc_5hc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

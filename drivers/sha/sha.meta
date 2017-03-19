@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.sha.support" requires="devices.LPC54S608"/>
+    <component description="SHA Driver" name="platform.drivers.sha" provides="platform.drivers" requires="platform.drivers.sha.support platform.drivers.common" type="driver" version="2.0.0" full_name= "SHA Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_sha.h"/>
+        <files mask="fsl_sha.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

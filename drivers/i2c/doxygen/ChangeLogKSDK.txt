@@ -1,0 +1,30 @@
+/*!
+@page driver_log Driver Change Log
+
+@section i2c I2C
+  Current I2C driver version is 2.0.3
+  
+
+  - 2.0.1
+    - New Features:
+      - Add double buffer enable configuration for Socs which have the DFEN bit in S2 register
+      - Add flexible transmit/receive buffer size support in I2C_SlaveHandleIRQ
+      - Add start flag clear, address match and release bus operation in I2C_SlaveWrite/ReadBlocking API
+    - Bug Fix:
+      - change the kI2C_SlaveRepeatedStartEvent to kI2C_SlaveStartEvent
+  - 2.0.2
+    - Bug Fix:
+      - Fix the issue that in master receive and slave transmit mode with no stop flag, master could not 
+        succeed to start next transfer because master could not send out re-start signal
+      - Fix data transfer out of order issue due to memory barrier
+      - Add hold time configuration for slave. By leaving the SCL divider and MULT reset values when configure to slave mode, 
+       the setup and hold time of the slave is then reduced outside of spec for lower baudrates. This can cause intermittent 
+       arbitration loss on the master side.
+    - New Features:
+      - Add address nak event for master.
+      - Add general call event for slave.
+  - 2.0.3
+    - Bug Fix:
+      - Remove enableHighDrive member in the master/slave configuration structure because the operation to HDRS bit is useless,
+        user needs to use DSE bit in port register to configure the high drive capability.
+*/

@@ -1,0 +1,30 @@
+/*!
+@page driver_log Driver Change Log
+
+@section lpuart LPUART
+  Current LPUART driver version is 2.2.3
+
+  - 2.1.0
+    - Update transactional APIs.
+
+  - 2.1.1
+    - Remove needless check of event flags and assert in LPUART_RTOS_Receive.
+    - Wait always for rx event flag in LPUART_RTOS_Receive.
+
+  - 2.2.0
+    - Add seven data bits and msb support
+
+  - 2.2.1
+    - Add seprarte rx,tx irq number support
+
+  - 2.2.2
+    - Add software reset feature support.
+    - Add software reset API to LPUART_Init().
+
+  - 2.2.3
+    - Change parameter type in LPUART_RTOS_Init() struct rtos_lpuart_config --> lpuart_rtos_config_t.
+    - Bug fixed:
+      - Disable LPUART receive interrupt instead of disable all NVIC when read data from ring buffer. 
+        Because with ring buffer used, receive nonblocking will disable all NVIC interrupts to protect 
+        the ring buffer, this will have negative effect to other IPS which are using interrupt.
+*/

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.acmp.support" requires="devices.modules.DriverType_QN_ACMP"/>
+    <component description="ACMP Driver" name="platform.drivers.qn_acmp" provides="platform.drivers" requires="platform.drivers.acmp.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_acmp.c"/>
+        <files mask="fsl_acmp.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>
+

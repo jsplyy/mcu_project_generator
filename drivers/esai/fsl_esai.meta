@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.esai.support" requires="devices.modules.DriverType_ESAI"/>
+    <component name="platform.drivers.sai.support.ip" requires="devices.modules.ipv_esai_005"/>
+
+    <component description="ESAI Driver" name="platform.drivers.esai" provides="platform.drivers" requires="platform.drivers.esai.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_esai.c"/>
+        <files mask="fsl_esai.h"/>
+        <files mask="fsl_esai_edma.c" requires="platform.drivers.edma"/>
+        <files mask="fsl_esai_edma.h" requires="platform.drivers.edma"/>
+      </source>
+    </component>
+  </components>
+</metadata>

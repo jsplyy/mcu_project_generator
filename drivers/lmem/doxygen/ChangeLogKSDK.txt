@@ -1,0 +1,12 @@
+/*!
+@page driver_log Driver Change Log
+
+@section lmem LMEM
+  Current lmem driver version is 2.1.0
+
+  - 2.0.0
+    - Initial version.
+  - 2.1.0
+    - Remove the write buffer enable from the cache enable API.
+    - Add Enable write buffer APIs.
+*/

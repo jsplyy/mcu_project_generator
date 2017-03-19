@@ -1,0 +1,307 @@
+/*!
+@defgroup emc EMC: External Memory Controller Driver
+@details The KSDK provides a peripheral driver for the External Memory Controller
+ block of Kinetis devices.
+
+The EMC driver is provides support for synchronous static memory devices such as RAM, rom and flash, in addition to dynamic memories such as single data rate SDRAM with an SDRAM clock of up to 100Mhz. From software control, three mainly function blocks are related:
+1. Baisc controller
+    a.Timing control with programmable delay elements.
+    b.Module enable.
+2. Dynamic memory controller
+3. Static memory controller
+
+When using EMC, call EMC_Init() function firstly to do module basic initialize. Note that
+this function enables the module clock, configure the module system level clock/delay and
+enable the module. It is the initialization of the Basic controller.
+To initialize the external dynamic memory. The EMC_DynamicMemInit() function shall be called before you can access any dynamic memory. The EMC_DynamicMemInit() function is
+provided to initialize the Static memory controller and it shall be called when you want
+to access any exterenal static memory. The function EMC_Deinit() deinitializes the EMC module. \n
+
+EMC Provides many basic opeartion APIs for application to do flexible control.
+The function EMC_Enable() is provided to enable/disable the EMC module.
+The function EMC_EnableDynamicMemControl() is provided to enable/disble the EMC dynamic memory controller.
+The function EMC_SendDynamicMemCommand() is provided to send the NOP/PRECHARGE/MODE/SELF-REFRESH commands. Call EMC_EnterLowPowerMode() to enter or exit the low-power mode. 
+There is a calibration function EMC_DelayCalibrate() which do calibaration of the EMC programmable delays by providing a real-time representation of the values of those deays.\n
+
+# Typical use case {#EMCTpyUC}
+This example shows how to use the EMC to initialize the external 64M 16-bit bus width SDRAM chip (4 banks nd 9 columns).
+The SDRAM is on the CS0.
+
+First, initialize the EMC Controller.
+~~~~~{.c}
+    // Basic configuration
+    emc_basic_config_t basiConfig = 
+    {
+        kEMC_LittleEndian,
+        kEMC_IntloopbackEmcclk,
+        1,    // EMC CLOCK DIV is 2
+        7,    // cmd delay is 7
+        7,    // feeback clock delay is 7
+    };
+
+    // Dynamic timing configuration.
+    emc_dynamic_timing_config_t timing =
+    {
+        (64000000/4096),   // refresh period in unit of nanosecond
+        kEMC_Cmddelay,
+        18,   //tRP
+        42,   //tRAS
+        70,  // TSREX
+        2,  //TAPR
+        5,  //TDAL
+        6,  //TWR
+        60,  //TRC
+        64,  //TREF
+        70,  //TXSR
+        12,  //TRRD
+        12,  //TMRD
+    };
+
+    // EMC dynamic memory chip independent configuration.
+    emc_dynamic_chip_config_t dynConfig =
+    {
+        0,    // dynamic memory chip 0
+        kEMC_Sdram,
+        2,    // RAS delay is 2 EMC clock cycles
+        0x23, // Burst length is 8, CAS latency is 2.
+        0x09, // 16-bit high performance, 4 banks, 9 columns
+    }
+
+    // EMC controller initialization.
+    uint8_t totalDynchips = 1;
+    EMC_Init(base, &basiConfig);
+    EMC_DynamicMemInit(base, &timing, &dynConfig, totalDynchips);
+
+    // Add Delay Calibration 
+    APP_DelayCal()
+    // R/W access to SDRAM Memory
+~~~~~
+
+For the APP_DelayCal():
+    The system configure provided the command and feedback clock delay calibration for EMC
+    EMCDYCTRL and EMCCAL. Application may require the change for these two system configure register. please use the recommded work flow to choose the best delay.
+
+~~~~~{.c}
+    volatile uint32_t ringosccount[2] = {0,0};
+
+    // function calibration
+    uint32_t calibration(uint16_t times)
+    {
+      uint32_t i;
+      uint32_t value;
+      uint32_t count = 0;
+
+      if (!times)
+      {
+          return 0;
+      }
+
+      for (i = 0; i < times; i++)
+      {
+          value = SYSCON->EMCDLYCAL & ~0x4000;
+          SYSCON->EMCDLYCAL = value | 0x4000;
+
+          while ((SYSCON->EMCDLYCAL & 0x8000) == 0x0000)
+          {
+            value = SYSCON->EMCDLYCAL;
+          }
+          count += (value & 0xFF); 
+      }
+      return (count / times);
+    }
+    
+    // sdram read and write test function
+    uint32_t sdram_rwtest( void )
+    {
+      volatile uint32_t *wr_ptr; 
+      volatile uint16_t *short_wr_ptr;
+      uint32_t data;
+      uint32_t i, j;
+
+      wr_ptr = (uint32_t *)SDRAM_BASE;
+      short_wr_ptr = (uint16_t *)wr_ptr;
+      /* Clear content before 16 bit access test */
+      memset(wr_ptr, 0, SDRAM_SIZE/4);
+
+      /* 16 bit write */
+      for (i = 0; i < SDRAM_SIZE/0x40000; i++)
+      {
+        for (j = 0; j < 0x10000; j++)
+        {
+          *short_wr_ptr++ = (i + j);
+          *short_wr_ptr++ = (i + j) + 1;
+        }
+      }
+
+      /* Verifying */
+      wr_ptr = (uint32_t *)SDRAM_BASE;
+      for (i = 0; i < SDRAM_SIZE/0x40000; i++)
+      {
+        for (j = 0; j < 0x10000; j++)
+        {
+          data = *wr_ptr;          
+          if (data != (((((i + j) + 1) & 0xFFFF) << 16) | ((i + j) & 0xFFFF)))
+          {
+          return 0x0;
+          }
+          wr_ptr++;
+        }
+      }
+      return 0x1;
+    }
+
+    // find the best cmd delay 
+    uint32_t find_cmddly(void)
+    {
+      uint32_t cmddly, cmddlystart, cmddlyend, dwtemp;
+      uint32_t ppass = 0x0, pass = 0x0;
+
+      cmddly = 0x0;
+      cmddlystart = cmddlyend = 0xFF;
+
+      while (cmddly < 32)
+      {
+      dwtemp = SYSCON->EMCDLYCTRL & ~0x1F;
+      SYSCON->EMCDLYCTRL = dwtemp | cmddly;
+
+      if (sdram_rwtest() == 0x1)
+      {
+        /* Test passed */
+        if (cmddlystart == 0xFF)
+        {
+        cmddlystart = cmddly;
+        }
+        ppass = 0x1;
+      }
+      else
+      {
+        /* Test failed */
+        if (ppass == 1)
+        {
+        cmddlyend = cmddly;
+        pass = 0x1;
+        ppass = 0x0;
+        }
+      }
+
+      /* Try next value */
+      cmddly++;
+      }
+
+      /* If the test passed, the we can use the average of the min and max values to get an optimal DQSIN delay */
+      if (pass == 0x1)
+      {
+      cmddly = (cmddlystart + cmddlyend) / 2;
+      }
+      else if (ppass == 0x1)
+      {
+      cmddly = (cmddlystart + 0x1F) / 2;
+      }
+      else
+      {
+      /* A working value couldn't be found, just pick something safe so the system doesn't become unstable */
+      cmddly = 0x10;
+      }
+
+      dwtemp = SYSCON->EMCDLYCTRL & ~0x1F;
+      SYSCON->EMCDLYCTRL = dwtemp | cmddly;
+
+      return (pass | ppass);
+    }
+    
+    // found the best feedback delay
+    uint32_t find_fbclkdly(void)
+    {
+      uint32_t fbclkdly, fbclkdlystart, fbclkdlyend, dwtemp;
+      uint32_t ppass = 0x0, pass = 0x0;
+
+      fbclkdly = 0x0;
+      fbclkdlystart = fbclkdlyend = 0xFF;
+
+      while (fbclkdly < 32)
+      {
+      dwtemp = SYSCON->EMCDLYCTRL & ~0x1F00;
+      SYSCON->EMCDLYCTRL = dwtemp | (fbclkdly << 8);
+
+      if (sdram_rwtest() == 0x1)
+      {
+        /* Test passed */
+        if (fbclkdlystart == 0xFF)
+        {
+        fbclkdlystart = fbclkdly;
+        }
+        ppass = 0x1;
+      }
+      else
+      {
+        /* Test failed */
+        if (ppass == 1)
+        {
+        fbclkdlyend = fbclkdly;
+        pass = 0x1;
+        ppass = 0x0;
+        }
+      }
+
+      /* Try next value */
+      fbclkdly++;
+      }
+
+      /* If the test passed, the we can use the average of the min and max values to get an optimal DQSIN delay */
+      if (pass == 0x1)
+      {
+      fbclkdly = (fbclkdlystart + fbclkdlyend) / 2;
+      }
+      else if (ppass == 0x1)
+      {
+      fbclkdly = (fbclkdlystart + 0x1F) / 2;
+      }
+      else
+      {
+      /* A working value couldn't be found, just pick something safe so the system doesn't become unstable */
+      fbclkdly = 0x10;
+      }
+
+      dwtemp = SYSCON->EMCDLYCTRL & ~0x1F00;
+      SYSCON->EMCDLYCTRL = dwtemp | (fbclkdly << 8);
+
+      return (pass | ppass);
+    }
+
+    // adjust the found the delay to the system configuration delay control register
+    void adjust_timing( void )
+    {
+      uint32_t dwtemp, cmddly, fbclkdly;
+
+      /* Current value */
+      ringosccount[1] = calibration();
+
+      dwtemp = SYSCON->EMCDLYCTRL;
+      cmddly = ((dwtemp & 0x1F) * ringosccount[0] / ringosccount[1]) & 0x1F;
+
+      fbclkdly = ((dwtemp & 0x1F00) * ringosccount[0] / ringosccount[1]) & 0x1F00;
+
+      SYSCON->EMCDLYCTRL = (dwtemp & ~0x1F1F) | fbclkdly | cmddly;
+    }
+    
+
+    APP_DelayCal()
+    {
+       ringosccount[0] = calibration();
+      
+      if (find_cmddly() == 0x0)
+      {
+        while (1);  /* fatal error */
+      }
+      
+      if (find_fbclkdly() == 0x0)
+      {
+        while (1);  /* fatal error */
+      }
+       adjust_timing();         
+    }
+
+~~~~~
+
+
+*/

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.fmeas.support" requires="devices.modules.DriverType_LPC_SYSCON"/>
+    <component description="FMEAS Driver" name="platform.drivers.fmeas" provides="platform.drivers" requires="platform.drivers.fmeas.support platform.drivers.common" type="driver" version="2.0.0" full_name= "FMEAS Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_fmeas.h"/>
+        <files mask="fsl_fmeas.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

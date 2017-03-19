@@ -1,0 +1,33 @@
+/*!
+@page drv_err Driver errors status
+ - #kStatus_EDMA_QueueFull = 5100
+ - #kStatus_EDMA_Busy = 5101
+*/
+
+/*!
+@defgroup dma3 EDMA: Enhanced Direct Memory Access (eDMA) Controller Driver
+@details The KSDK provides a peripheral driver for the enhanced Direct Memory Access (eDMA)
+         of Kinetis devices.
+
+# Typical use case{#EDMATypicalUseCase}
+
+## EDMA Operation{#EDMAOper}
+
+~~~~~{.c}
+    edma_transfer_config_t transferConfig;
+    edma_config_t userConfig;
+    uint32_t transferDone = false;
+
+    EDMA_GetDefaultConfig(&userConfig);
+    EDMA_Init(DMA0, &userConfig);
+    EDMA_CreateHandle(&g_EDMA_Handle, DMA0, channel);
+    EDMA_SetCallback(&g_EDMA_Handle, EDMA_Callback, &transferDone);
+    EDMA_PrepareTransfer(&transferConfig, srcAddr, srcWidth, destAddr, destWidth,
+                         bytesEachRequest, transferBytes, kEDMA_MemoryToMemory);
+    EDMA_SubmitTransfer(&g_EDMA_Handle, &transferConfig, true);
+    EDMA_StartTransfer(&g_EDMA_Handle);
+    /* Waits for the eDMA transfer to finish */
+    while (transferDone != true);
+~~~~~
+*/
+

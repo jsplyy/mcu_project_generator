@@ -1,0 +1,67 @@
+
+
+/*!
+@defgroup sdif SDIF: SD/MMC/SDIO card interface
+@details The KSDK provides a peripheral driver for the SD/MMC/SDIO card interface (sdif)
+         module of LPC devices.
+
+# Typical use case {#sdifTypUC}
+
+## sdif Operation {#sdifOperation}
+
+~~~~~{.c}
+/* Initializes the sdif. */
+    sdif_config_t sdifConfig;
+    sdifConfig->responseTimeout = 0x40U;
+    sdifConfig->cardDetDebounce_Clock = 0xFFFFFFU;
+    sdifConfig->dataTimeout = 0xFFFFFFU;
+    SDIF_Init(BOARD_sdif_BASEADDR, sdifConfig);
+
+/* transfer data/commmand in a blocking way */
+    /* Internal DMA configuraion */
+    sdif_dma_config_t dmaConfig;
+    dmaConfig.enableFixBurstLen = true;
+    dmaConfig.mode = kSDIF_ChainDMAMode;
+    dmaConfig.dmaDesBufferLen = 0x04;/* one contain one descriptor */
+
+    /* config the command to send */
+    sdif_command_t command;
+    command.index = read/write;
+    command.argument = argument;
+    command.responseType = command response type;
+
+    /* config the data if need transfer data */
+    sdif_data_t data;
+    data.autoDataTransferStop = true;
+    data.blockSize = 128;
+    data.blockCount = 1;
+    data.rxData = user define buffer to recieve data;
+
+    /* transfer data in blocking way */
+    sdif_transfer_t transfer.;
+    transfer.dmaConfig = &dmaConfig;
+    transfer.command = &command;
+    transfer.data = &data;
+
+    /* need check the status */
+    SDIF_TransferBlocking(base, &transfer);
+
+/* transfer data/command in a non-blocking way */
+    /* create you call back function */
+    sdif_transfer_callback_t callBack;
+    callBack.CardInserted = CardInsert;
+    callBack.DMADesUnavailable = DMADesUnavailable;
+    callBack.CommandReload = CommandReload;
+    callBack.TransferComplete = TransferComplete;
+
+    sdif_handle_t handle;
+    SDIF_TransferCreateHandle(base, &handle,  &callback, &userData);
+    SDIF_TransferNonBlocking(base, &handle, &transfer);
+
+    /* do not need to check the status by software, interrupt will be trigger
+    when error happen */
+
+~~~~~
+
+*/
+

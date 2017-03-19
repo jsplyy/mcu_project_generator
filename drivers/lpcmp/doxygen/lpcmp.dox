@@ -1,0 +1,104 @@
+/*!
+@defgroup lpcmp LPCMP: Low Power Analog Comparator Driver
+@details The KSDK provides a peripheral driver for the Low Power Analog Comparator (LPCMP) module of Kinetis devices.
+
+
+The LPCMP driver is a basic comparator
+with advanced features. The APIs for the basic comparator enable the LPCMP to compare the
+two voltages of the two input channels and create the output of the comparator result. The APIs for advanced features
+can be used as the plug-in functions based on the basic comparator. They can process the comparator's output with
+hardware support.
+
+# Typical use case {#LPCMPTpyUC}
+
+## Polling Configuration {#LPCMPPolConfig}
+
+~~~~~{.c}
+
+    int main(void)
+    {
+        lpcmp_config_t mLpcmpConfigStruct;
+        lpcmp_dac_config_t mLpcmpDacConfigStruct;
+
+        // ...
+
+        // Configures the comparator.
+        LPCMP_Init(DEMO_LPCMP_INSTANCE);
+        LPCMP_GetDefaultConfig(&mLpcmpConfigStruct);
+        LPCMP_Configure(DEMO_LPCMP_INSTANCE, &mLpcmpConfigStruct);
+
+        // Configures the DAC channel.
+        mLpcmpDacConfigStruct.referenceVoltageSource = kLPCMP_VrefSourceVin2; // VCC.
+        mLpcmpDacConfigStruct.DACValue = 32U; // Half voltage of logic high-level.
+        LPCMP_SetDACConfig(DEMO_LPCMP_INSTANCE, &mLpcmpDacConfigStruct);
+        LPCMP_SetInputChannels(DEMO_LPCMP_INSTANCE, DEMO_LPCMP_USER_CHANNEL, DEMO_LPCMP_DAC_CHANNEL);
+
+        while (1)
+        {
+            if (0U != (kLPCMP_OutputAssertEventFlag & LPCMP_GetStatusFlags(DEMO_LPCMP_INSTANCE)))
+            {
+                // Do something.
+            }
+            else
+            {
+                // Do something.
+            }
+        }
+    }
+
+~~~~~
+
+## Interrupt Configuration {#LPCMPIntConfig}
+
+~~~~~{.c}
+
+    volatile uint32_t g_LpcmpFlags = 0U;
+
+    // ...
+
+    void DEMO_LPCMP_IRQ_HANDLER_FUNC(void)
+    {
+        g_LpcmpFlags = LPCMP_GetStatusFlags(DEMO_LPCMP_INSTANCE);
+        LPCMP_ClearStatusFlags(DEMO_LPCMP_INSTANCE, kLPCMP_OutputRisingEventFlag | kLPCMP_OutputFallingEventFlag);
+        if (0U != (g_LpcmpFlags & kLPCMP_OutputRisingEventFlag))
+        {
+            // Do something.
+        }
+        else if (0U != (g_LpcmpFlags & kLPCMP_OutputFallingEventFlag))
+        {
+            // Do something.
+        }
+    }
+
+    int main(void)
+    {
+        lpcmp_config_t mLpcmpConfigStruct;
+        lpcmp_dac_config_t mLpcmpDacConfigStruct;
+
+        // ...
+        EnableIRQ(DEMO_LPCMP_IRQ_ID);
+        // ...
+
+        // Configures the comparator.
+        LPCMP_Init(DEMO_LPCMP_INSTANCE);
+        LPCMP_GetDefaultConfig(&mLpcmpConfigStruct);
+        LPCMP_Configure(DEMO_LPCMP_INSTANCE, &mLpcmpConfigStruct);
+
+        // Configures the DAC channel.
+        mLpcmpDacConfigStruct.referenceVoltageSource = kLPCMP_VrefSourceVin2; // VCC.
+        mLpcmpDacConfigStruct.DACValue = 32U; // Half voltage of logic high-level.
+        LPCMP_SetDACConfig(DEMO_LPCMP_INSTANCE, &mLpcmpDacConfigStruct);
+        LPCMP_SetInputChannels(DEMO_LPCMP_INSTANCE, DEMO_LPCMP_USER_CHANNEL, DEMO_LPCMP_DAC_CHANNEL);
+
+        // Enables the output rising and falling interrupts.
+        LPCMP_EnableInterrupts(DEMO_LPCMP_INSTANCE, kLPCMP_OutputRisingInterruptEnable | kLPCMP_OutputFallingInterruptEnable);
+
+        while (1)
+        {
+        }
+    }
+
+~~~~~
+
+*/
+

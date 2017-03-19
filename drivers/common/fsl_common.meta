@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+  <components>
+    <component description="COMMON Driver" name="platform.drivers.common" requires="platform.devices.CMSIS platform.drivers.clock platform.utilities.debug_console" provides="platform.drivers" type="driver" version="2.0.0" full_name= "COMMON Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_common.c"/>
+        <files mask="fsl_common.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

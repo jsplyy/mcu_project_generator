@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.lpuart.support" requires="devices.modules.DriverType_LPUART"/>
+    <component name="platform.drivers.lpuart.support.ip" requires="devices.modules.D_IP_LPUART_SYN_017"/>
+    <component name="platform.drivers.lpuart.support.ip" requires="devices.modules.D_IP_LPUART_SYN_020"/>
+    <component name="platform.drivers.lpuart.support.ip" requires="devices.modules.D_IP_LPUART_SYN_012"/>
+    <component name="platform.drivers.lpuart.support.ip" requires="devices.modules.D_IP_LPUART_SYN_011"/>
+    <component name="platform.drivers.lpuart.support.ip" requires="devices.modules.D_IP_LPUART_SYN_018"/>
+    <component name="platform.drivers.lpuart.support.ip" requires="devices.modules.D_IP_LPUART_SYN_023"/>
+    <component name="platform.drivers.lpuart.support.ip" requires="devices.modules.D_IP_LPUART_SYN_024"/>
+    <component description="LPUART Driver" name="platform.drivers.lpuart" provides="platform.drivers" requires="platform.drivers.lpuart.support platform.drivers.common" type="driver" version="2.2.3" full_name="LPUART Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_lpuart.c"/>
+        <files mask="fsl_lpuart.h"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_lpuart_dma.c" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_lpuart_dma.h" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_lpuart_edma.c" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_lpuart_edma.h" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_lpuart_freertos.c" requires="middleware.freertos"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_lpuart_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

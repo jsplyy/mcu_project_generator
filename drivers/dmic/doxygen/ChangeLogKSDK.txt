@@ -1,0 +1,6 @@
+/*!
+@page driver_log Driver Change Log
+
+@section dmic DMIC
+  Current DMIC driver version is 2.0.0
+*/

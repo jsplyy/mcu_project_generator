@@ -1,0 +1,24 @@
+/*!
+@defgroup cache CACHE: CACHE Memory Controller
+@details The SDK provides Peripheral driver for the CACHE Controller.
+
+CACHE driver is created to help user to operate the Cache memory more easy. The APIs for basic operations are including the following two levels:
+1L. The L1 cache driver API. 
+The L1 cache driver API here is a defined as core integrated caches controller driver
+for all core-A intergreated caches:
+a. L1 maintain only if L2 is not supported
+b. L1 and L2 cache maintain together. 
+
+2L. The combined cache driver API.
+This level provides unified APIs for combined cache maintain operations. This is
+provided for SDK drivers (DMA, ENET, USDHC etc) which should do the cache maintenance in their 
+transactional APIs. In this architecture, there is only core intergrated cache, so the unified
+APIs here is directly call the L1 cache driver API. 
+
+# Function groups {#CACHEFuncGrps}
+
+## L1 CACHE Operation {#L1CACHE MaintainOperation}
+The L1 CACHE has both code cache and data cache. This function group provides independent two  groups API for both code cache and data cache.
+There are Enable/Disable APIs for code cache and data cache control and cache maintenance operations as Invalidate/Clean/CleanInvalidate by all and by address range.
+
+*/

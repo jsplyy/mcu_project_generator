@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.uart.support" requires="devices.modules.DriverType_IUART"/>
+    <component description="UART Driver" name="platform.drivers.uart" provides="platform.drivers" requires="platform.drivers.uart.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_uart.c"/>
+        <files mask="fsl_uart.h"/>
+        <files mask="fsl_uart_freertos.c" requires="middleware.freertos"/>
+        <files mask="fsl_uart_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

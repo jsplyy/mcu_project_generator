@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.adc.support" requires="devices.modules.DriverType_LPCADC"/>
+    <component description="ADC Driver" name="platform.drivers.lpadc" provides="platform.drivers" requires="platform.drivers.adc.support platform.drivers.common" type="driver" version="2.0.0" full_name= "ADC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_lpadc.c"/>
+        <files mask="fsl_lpadc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

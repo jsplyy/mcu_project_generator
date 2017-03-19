@@ -1,0 +1,31 @@
+/*!
+@page drv_err Driver errors status
+ - #kStatus_DMA_Busy = 5000
+*/
+
+/*!
+@defgroup dma DMA: Direct Memory Access Controller Driver
+@details The SDK provides a peripheral driver for the Direct Memory Access (DMA)
+          of LPC devices.
+
+# Typical use case{#DMATypicalUseCase}
+
+## DMA Operation{#DMAOper}
+
+~~~~~{.c}
+    dma_transfer_config_t transferConfig;
+    uint32_t transferDone = false;
+
+    DMA_Init(DMA0);
+    DMA_EnableChannel(DMA0, channel);
+    DMA_SetChannelPriority(DMA0, channel, kDMA_ChannelPriority0);
+    DMA_CreateHandle(&g_DMA_Handle, DMA0, channel);
+    DMA_SetCallback(&g_DMA_Handle, DMA_Callback, &transferDone);
+    DMA_PrepareTransfer(&transferConfig, srcAddr, destAddr, transferByteWidth, transferBytes,
+                        kDMA_MemoryToMemory, NULL);
+    DMA_SubmitTransfer(&g_DMA_Handle, &transferConfig);
+    DMA_StartTransfer(&g_DMA_Handle);
+    /* Wait for DMA transfer finish */
+    while (transferDone != true);
+~~~~~
+*/

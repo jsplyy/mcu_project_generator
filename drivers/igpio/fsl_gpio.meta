@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.gpio.support" requires="devices.modules.DriverType_IGPIO"/>
+    <component description="GPIO Driver" name="platform.drivers.gpio" provides="platform.drivers" requires="platform.drivers.gpio.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_gpio.c"/>
+        <files mask="fsl_gpio.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

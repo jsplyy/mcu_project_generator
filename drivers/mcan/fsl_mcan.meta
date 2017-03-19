@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.mcan.support" requires="devices.modules.DriverType_LPC_CAN"/>
+    <component description="MCAN Driver" name="platform.drivers.mcan" provides="platform.drivers" requires="platform.drivers.mcan.support platform.drivers.common" type="driver" version="2.0.0" full_name= "MCAN Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_mcan.c"/>
+        <files mask="fsl_mcan.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

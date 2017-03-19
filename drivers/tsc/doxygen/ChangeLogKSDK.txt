@@ -1,0 +1,11 @@
+/*!
+@page driver_log Driver Change Log
+
+@section tsc TSC
+  Current TSC driver version is 2.0.0
+
+  - 2.0.0
+    - Initial version.
+    - This module is developed firstly on I.mx6ull.
+
+*/

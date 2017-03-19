@@ -1,0 +1,321 @@
+/*!
+@defgroup uart UART: Universal Asynchronous Receiver/Transmitter Driver
+*/
+
+/*!
+@defgroup uart_driver UART Driver
+@ingroup uart
+@details The KSDK provides a peripheral driver for the Universal Asynchronous Receiver/Transmitter (UART)
+         module of Kinetis devices.
+
+
+The UART driver includes functional APIs and transactional APIs.
+
+Functional APIs are used for UART initialization/configuration/operation for
+optimization/customization purpose. Using the functional API requires the
+knowledge of the UART peripheral and how to organize functional APIs to
+meet the application requirements. All functional APIs use the peripheral base
+address as the first parameter. UART functional operation groups provide the
+functional API set.
+
+Transactional APIs can be used to enable the peripheral quickly and in the
+application if the code size and performance of transactional APIs can satisfy the
+requirements. If the code size and performance are critical requirements,
+see the transactional API implementation and write custom code. All
+transactional APIs use the uart_handle_t as the second parameter.
+Initialize the handle by calling the UART_TransferCreateHandle() API.
+
+Transactional APIs support asynchronous transfer, which means that the functions
+UART_TransferSendNonBlocking() and UART_TransferReceiveNonBlocking() set up an interrupt for data
+transfer. When the transfer completes, the upper layer is notified through a callback
+function with the kStatus_UART_TxIdle and kStatus_UART_RxIdle.
+
+Transactional receive APIs support the ring buffer. Prepare the
+memory for the ring buffer and pass in the start address and size while calling the
+UART_TransferCreateHandle(). If passing  NULL, the ring buffer feature is disabled.
+When the ring buffer is enabled, the received data is saved to the ring buffer in the background.
+The UART_TransferReceiveNonBlocking() function first gets data from the ring buffer. If
+the ring buffer does not have enough data, the function first returns the data in the
+ring buffer and then saves the received data to user memory. When all data is received,
+the upper layer is informed through a callback with the kStatus_UART_RxIdle.
+
+If the receive ring buffer is full, the upper layer is informed through a callback with the
+kStatus_UART_RxRingBufferOverrun. In the callback function, the upper layer reads
+data out from the ring buffer. If not, existing data is overwritten by the new data.
+
+The ring buffer size is specified when creating the handle. Note that
+one byte is reserved for the ring buffer maintenance. When
+creating handle using the following code.
+
+~~~~~{.c}
+    UART_TransferCreateHandle(UART0, &handle, UART_UserCallback, NULL);
+~~~~~
+
+In this example, the buffer size is 32, but only 31 bytes are used for
+saving data.
+
+# Typical use case {#UARTCase}
+
+## UART Send/receive using a polling method {#UARTCasePolling}
+
+~~~~~{.c}
+
+    UART_GetDefaultConfig(&config);
+    config.baudRate_Bps = DEMO_UART_BAUDRATE;
+    config.enableTx = true;
+    config.enableRx = true;
+
+    UART_Init(DEMO_UART, &config, DEMO_UART_FREQ);
+    UART_WriteBlocking(DEMO_UART, txbuff, sizeof(txbuff) - 1);
+
+    while (1)
+    {
+        UART_ReadBlocking(DEMO_UART, &ch, 1);
+        UART_WriteBlocking(DEMO_UART, &ch, 1);
+    }
+~~~~~
+
+## UART Send/receive using an interrupt method {#UARTCaseInterrupt}
+
+~~~~~{.c}
+    
+void DEMO_UART_IRQHandler(void)
+{
+    uint8_t data;
+
+    /* If new data arrived. */
+    if ((UART_GetStatusFlag(DEMO_UART, kUART_RxDataReadyFlag)) || (UART_GetStatusFlag(DEMO_UART, kUART_RxOverrunFlag)))
+    {
+        data = UART_ReadByte(DEMO_UART);
+
+        /* If ring buffer is not full, add data to ring buffer. */
+        if (((rxIndex + 1) % DEMO_RING_BUFFER_SIZE) != txIndex)
+        {
+            demoRingBuffer[rxIndex] = data;
+            rxIndex++;
+            rxIndex %= DEMO_RING_BUFFER_SIZE;
+        }
+    }
+}
+
+int main(void)
+{
+    uart_config_t config;
+
+    BOARD_InitHardware();
+    SystemInstallIrqHandler(DEMO_IRQn, (system_irq_handler_t)DEMO_UART_IRQHandler, NULL);
+
+    /*
+     * config.baudRate_Bps = 115200U;
+     * config.parityMode = kUART_ParityDisabled;
+     * config.dataBitsCount = kUART_EightDataBits;
+     * config.stopBitCount = kUART_OneStopBit;
+     * config.txFifoWatermark = 2;
+     * config.rxFifoWatermark = 1;
+     * config.enableTx = false;
+     * config.enableRx = false;
+     */
+    UART_GetDefaultConfig(&config);
+    config.baudRate_Bps = DEMO_UART_BAUDRATE;
+    config.enableTx = true;
+    config.enableRx = true;
+
+    UART_Init(DEMO_UART, &config, DEMO_UART_CLKSRC);
+
+    /* Send g_tipString out. */
+    UART_WriteBlocking(DEMO_UART, g_tipString, sizeof(g_tipString) / sizeof(g_tipString[0]) - 1);
+
+    /* Enable RX interrupt. */
+    UART_EnableInterrupts(DEMO_UART, kUART_RxDataReadyEnable | kUART_RxOverrunEnable);
+    EnableIRQ(DEMO_IRQn);
+
+    while (1)
+    {
+        /* Send data only when UART TX register is empty and ring buffer has data to send out. */
+        while ((UART_GetStatusFlag(DEMO_UART, kUART_TxReadyFlag)) && (rxIndex != txIndex))
+        {
+            UART_WriteByte(DEMO_UART, demoRingBuffer[txIndex]);
+            txIndex++;
+            txIndex %= DEMO_RING_BUFFER_SIZE;
+        }
+    }
+}
+~~~~~
+
+## UART Receive using the ringbuffer feature {#UARTCaseRing}
+
+~~~~~{.c}
+
+#define RX_RING_BUFFER_SIZE 20U
+#define ECHO_BUFFER_SIZE 8U
+
+/*******************************************************************************
+ * Prototypes
+ ******************************************************************************/
+
+/* UART user callback */
+void UART_UserCallback(UART_Type *base, uart_handle_t *handle, status_t status, void *userData);
+
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
+uart_handle_t g_uartHandle;
+uint8_t g_tipString[] = "UART RX ring buffer example\r\nSend back received data\r\nEcho every 8 bytes\r\n";
+uint8_t g_rxRingBuffer[RX_RING_BUFFER_SIZE] = {0}; /* RX ring buffer. */
+
+uint8_t g_rxBuffer[ECHO_BUFFER_SIZE] = {0}; /* Buffer for receive data to echo. */
+uint8_t g_txBuffer[ECHO_BUFFER_SIZE] = {0}; /* Buffer for send data to echo. */
+volatile bool rxBufferEmpty = true;
+volatile bool txBufferFull = false;
+volatile bool txOnGoing = false;
+volatile bool rxOnGoing = false;
+
+/*******************************************************************************
+ * Code
+ ******************************************************************************/
+/* UART user callback */
+void UART_UserCallback(UART_Type *base, uart_handle_t *handle, status_t status, void *userData)
+{
+    userData = userData;
+
+    if (kStatus_UART_TxIdle == status)
+    {
+        txBufferFull = false;
+        txOnGoing = false;
+    }
+}
+
+int main(void)
+{
+    uart_config_t config;
+    uart_transfer_t xfer;
+    uart_transfer_t sendXfer;
+    uart_transfer_t receiveXfer;
+    size_t receivedBytes;
+    uint32_t i;
+
+    BOARD_InitHardware();
+
+    /*
+     * config.baudRate_Bps = 115200U;
+     * config.parityMode = kUART_ParityDisabled;
+     * config.dataBitsCount = kUART_EightDataBits;
+     * config.stopBitCount = kUART_OneStopBit;
+     * config.txFifoWatermark = 2;
+     * config.rxFifoWatermark = 16;
+     * config.enableTx = false;
+     * config.enableRx = false;
+     */
+    UART_GetDefaultConfig(&config);
+    config.baudRate_Bps = DEMO_UART_BAUDRATE;
+    config.txFifoWatermark = 2;
+    config.rxFifoWatermark = 16;
+    config.enableTx = true;
+    config.enableRx = true;
+
+    UART_Init(DEMO_UART, &config, DEMO_UART_CLKSRC);
+    UART_TransferCreateHandle(DEMO_UART, &g_uartHandle, UART_UserCallback, NULL);
+    UART_TransferStartRingBuffer(DEMO_UART, &g_uartHandle, g_rxRingBuffer, RX_RING_BUFFER_SIZE);
+
+    /* Send g_tipString out. */
+    xfer.data = g_tipString;
+    xfer.dataSize = sizeof(g_tipString) - 1;
+    txOnGoing = true;
+    UART_TransferSendNonBlocking(DEMO_UART, &g_uartHandle, &xfer);
+
+    /* Wait send finished */
+    while (txOnGoing)
+    {
+    }
+
+    /* Start to echo. */
+    sendXfer.data = g_txBuffer;
+    sendXfer.dataSize = ECHO_BUFFER_SIZE;
+    receiveXfer.data = g_rxBuffer;
+    receiveXfer.dataSize = ECHO_BUFFER_SIZE;
+
+    while (1)
+    {
+        /* If g_txBuffer is empty and g_rxBuffer is full, copy g_rxBuffer to g_txBuffer. */
+        if ((!rxBufferEmpty) && (!txBufferFull))
+        {
+            memcpy(g_txBuffer, g_rxBuffer, ECHO_BUFFER_SIZE);
+            rxBufferEmpty = true;
+            txBufferFull = true;
+        }
+
+        /* If the data in ring buffer reach ECHO_BUFFER_SIZE, then start to read data from ring buffer. */
+        if (ECHO_BUFFER_SIZE <= UART_TransferGetRxRingBufferLength(&g_uartHandle))
+        {
+            UART_TransferReceiveNonBlocking(DEMO_UART, &g_uartHandle, &receiveXfer, &receivedBytes);
+            rxBufferEmpty = false;
+        }
+
+        /* If TX is idle and g_txBuffer is full, start to send data. */
+        if ((!txOnGoing) && txBufferFull)
+        {
+            txOnGoing = true;
+            UART_TransferSendNonBlocking(DEMO_UART, &g_uartHandle, &sendXfer);
+        }
+
+        /* Delay some time, simulate the app is processing other things, input data save to ring buffer. */
+        i = 0x10U;
+        while (i--)
+        {
+            __NOP();
+        }
+    }
+}
+~~~~~
+
+## UART automatic baud rate detect feature {#UARTCaseAutoBaudRate}
+
+~~~~~{.c}
+
+int main(void)
+{
+    uint8_t ch;
+
+    uart_config_t config;
+
+    BOARD_InitHardware();
+
+    /*
+     * config.baudRate_Bps = 115200U;
+     * config.parityMode = kUART_ParityDisabled;
+     * config.stopBitCount = kUART_OneStopBit;
+     * config.txFifoWatermark = 2;
+     * config.rxFifoWatermark = 1;
+     * config.enableTx = false;
+     * config.enableRx = false;
+     */
+    UART_GetDefaultConfig(&config);
+    config.baudRate_Bps = NULL;
+
+    config.enableTx = true;
+    config.enableRx = true;
+
+    UART_Init(DEMO_UART, &config, DEMO_UART_FREQ);
+    UART_EnableAutoBaudRate(DEMO_UART, true);
+
+    while (!UART_IsAutoBaudRateComplete(DEMO_UART))
+    {
+    }
+    UART_WriteBlocking(DEMO_UART, infobuff, sizeof(infobuff) - 1);
+    /* Read the detect character from recevier register */
+    UART_ReadBlocking(DEMO_UART, &ch, 1);
+    UART_WriteBlocking(DEMO_UART, &ch, 1);
+
+    UART_WriteBlocking(DEMO_UART, txbuff, sizeof(txbuff) - 1);
+
+    while (1)
+    {
+        UART_ReadBlocking(DEMO_UART, &ch, 1);
+        UART_WriteBlocking(DEMO_UART, &ch, 1);
+    }
+}
+
+~~~~~
+*/
+
+

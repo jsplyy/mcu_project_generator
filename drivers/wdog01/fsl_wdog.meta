@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.wdog01.support" requires="devices.modules.DriverType_WDOG devices.modules.DriverFeature_WDOG_wdog01"/>
+    <component name="platform.drivers.wdog01.support.ip" requires="d_ssl_wdog_ultra_syn_001"/>
+    <component description="wdog01 Driver" name="platform.drivers.wdog01" provides="platform.drivers" requires="platform.drivers.wdog01.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "wdog01 Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_wdog.c"/>
+        <files mask="fsl_wdog.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

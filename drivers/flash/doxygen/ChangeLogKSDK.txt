@@ -1,0 +1,26 @@
+/*!
+@page driver_log Driver Change Log
+
+@section flash FLASH
+  Current FLASH driver version is 2.2.0
+
+  - 2.0.0
+    - Initial version
+
+  - 2.1.0
+    - New Features:
+      - Support FTFL device in FLASH_Swap API
+      - Support various pflash start addresses
+      - Add support for KV58 in cache clear function
+    - Bug Fix:
+      - Compiled execute-in-ram functions as PIC binary code for driver use
+      - Added missed flexram properties
+      - Fixed unaligned variable issue for execute-in-ram function code array
+
+  - 2.2.0
+    - New Features:
+      - Add support for device with secondary flash (KW40)
+      - Add support for device with LP flash (K3S/G)
+      - Add flash prefetch speculation APIs
+
+*/

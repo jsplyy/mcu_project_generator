@@ -1,0 +1,14 @@
+/*!
+@defgroup wdog_ultra WDOG: Watchdog Timer Driver
+@details The KSDK provides a peripheral driver for the Watchdog module (WDOG) of Kinetis devices.
+
+# Typical use case {#WDOGTypUC}
+~~~~~{.c}
+    wdog_config_t config;
+    WDOG_GetDefaultConfig(&config);
+    config.timeoutValue = 0xffU;
+	config.interruptTimeValue = 0x04u;
+	config.enablePowerdown = false;
+    WDOG_Init(wdog_base,&config);
+~~~~~
+*/

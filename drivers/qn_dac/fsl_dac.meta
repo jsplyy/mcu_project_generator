@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.dac.support" requires="devices.modules.DriverType_QN_DAC"/>
+    <component description="DAC Driver" name="platform.drivers.qn_dac" provides="platform.drivers" requires="platform.drivers.dac.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_dac.c"/>
+        <files mask="fsl_dac.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>
+

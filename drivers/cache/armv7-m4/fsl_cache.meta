@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.cache.support" requires="devices.modules.DriverType_LMEM"/>
+    <component name="platform.drivers.cache.support.ip" requires="devices.modules.D_IP_AHB_LMEM_SYN_026"/>
+    <component description="CACHE Driver" name="platform.drivers.cache" provides="platform.drivers" requires="platform.drivers.cache.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "CACHE Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_cache.c"/>
+        <files mask="fsl_cache.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

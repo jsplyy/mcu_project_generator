@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.lpi2c.support" requires="devices.modules.DriverType_LPI2C"/>
+    <component name="platform.drivers.lpi2c.support.ip" requires="devices.modules.D_IP_LPI2C_SYN_010"/>
+    <component name="platform.drivers.lpi2c.support.ip" requires="devices.modules.D_IP_LPI2C_SYN_012"/>
+    <component description="LPI2C Driver" name="platform.drivers.lpi2c" provides="platform.drivers" requires="platform.drivers.lpi2c.support platform.drivers.common" type="driver" version="2.1.1" change_log="./doxygen/ChangeLogKSDK.txt" full_name="LPI2C Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_lpi2c.c"/>
+        <files mask="fsl_lpi2c.h"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_lpi2c_edma.c" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_lpi2c_edma.h" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_lpi2c_freertos.c" requires="middleware.freertos"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_lpi2c_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

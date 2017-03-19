@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.caam.support" requires="devices.modules.DriverType_CAAM"/>
+    <component name="platform.drivers.caam.support.ip" requires="devices.modules.caam_imx_lt_010"/>
+    <component description="CAAM Driver" name="platform.drivers.caam" provides="platform.drivers" requires="platform.drivers.caam.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "CAAM Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_caam.c"/>
+        <files mask="fsl_caam.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

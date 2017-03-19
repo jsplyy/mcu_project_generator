@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.utick.support" requires="devices.modules.DriverType_LPC_UTICK"/>
+    <component description="UTICK Driver" name="platform.drivers.utick" provides="platform.drivers" requires="platform.drivers.utick.support platform.drivers.common" type="driver" version="2.0.0" full_name= "UTICK Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_utick.h"/>
+        <files mask="fsl_utick.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

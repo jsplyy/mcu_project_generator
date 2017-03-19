@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.xrdc.support" requires="devices.modules.DriverType_XRDC"/>
+    <component name="platform.drivers.xrdc.support.ip" requires="devices.modules.D_IP_ACP_XRDC_SYN_021"/>
+    <component name="platform.drivers.xrdc.support.ip" requires="devices.modules.D_IP_XRDC_1DOT1_SYN_001"/>
+    <component name="platform.drivers.xrdc.support.ip" requires="devices.modules.D_IP_XRDC_1DOT1_SYN_010"/>
+    <component description="XRDC Driver" name="platform.drivers.xrdc" provides="platform.drivers" requires="platform.drivers.xrdc.support platform.drivers.common" type="driver" version="2.0.3" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "XRDC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_xrdc.c"/>
+        <files mask="fsl_xrdc.h"/>
+        <files mask="fsl_xrdc_mappings.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

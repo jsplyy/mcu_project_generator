@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.bod.support" requires="devices.modules.DriverType_QN_BOD"/>
+    <component description="BOD Driver" name="platform.drivers.qn_bod" provides="platform.drivers" requires="platform.drivers.bod.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_bod.c"/>
+        <files mask="fsl_bod.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>
+

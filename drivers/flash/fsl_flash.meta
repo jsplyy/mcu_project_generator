@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+  <components>
+    <component description="Flash Driver" name="platform.drivers.flash" provides="platform.drivers" type="driver" version="2.2.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "Flash Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_flash.c"/>
+        <files mask="fsl_flash.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.lpc_enet.support" requires="devices.modules.DriverType_LPC_ENET"/>
+    <component description="enet Driver" name="platform.drivers.lpc_enet" provides="platform.drivers" requires="platform.drivers.lpc_enet.support platform.drivers.common" type="driver" version="1.0.0" full_name= "enet Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_enet.c"/>
+        <files mask="fsl_enet.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

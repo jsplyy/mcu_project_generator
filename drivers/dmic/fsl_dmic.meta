@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.dmic.support" requires="devices.modules.DriverType_LPC_DMIC"/>
+    <component description="DMIC Driver" name="platform.drivers.dmic" provides="platform.drivers" requires="platform.drivers.dmic.support platform.drivers.common" type="driver" version="2.0.0" full_name= "DMIC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_dmic.h"/>
+        <files mask="fsl_dmic.c"/>
+        <files mask="fsl_dmic_dma.h"/>
+        <files mask="fsl_dmic_dma.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

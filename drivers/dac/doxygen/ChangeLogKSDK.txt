@@ -1,0 +1,12 @@
+/*!
+@page driver_log Driver Change Log
+
+@section dac DAC
+  Current DAC driver version is 2.0.1
+
+  - 2.0.0
+    - Initial version.
+  - 2.0.1
+    - Bug fix:
+      - Move the default DAC_Enable(..., true) from DAC_Init() to application code, so that users can enable the DAC's output when they will. 
+*/

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.lcdc.support" requires="devices.modules.DriverType_LPC_LCD"/>
+    <component description="LCDC Driver" name="platform.drivers.lpc_lcdc" provides="platform.drivers" requires="platform.drivers.lcdc.support platform.drivers.common" type="driver" version="2.0.0" full_name= "LCDC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_lcdc.c"/>
+        <files mask="fsl_lcdc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

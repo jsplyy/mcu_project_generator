@@ -1,0 +1,41 @@
+/*!
+@defgroup fmeas FMEAS: Frequency Measure Driver
+@details The SDK provides a peripheral driver for the Frequency Measure function of LPC devices' SYSCON module.
+ @n
+It measures frequency of any on-chip or off-chip clock signal.
+The more precise and higher accuracy clock is selected as a reference clock.
+The resulting frequency is internally computed from the ratio of value of selected target and reference clock counters.
+ @n
+
+
+# Frequency Measure Driver operation {#FMEASInit}
+
+INPUTMUX_AttachSignal() function has to be used to select reference and target clock signal sources.
+
+FMEAS_StartMeasure() function starts the measurement cycle.
+
+FMEAS_IsMeasureComplete() can be polled to check if the measurement cycle has finished.
+
+FMEAS_GetFrequency() returns the frequency of the target clock. Frequency of the reference clock has to be provided as a parameter.
+
+# Typical use case {#FMEASTypUC}
+~~~~~{.c}
+    uint32_t freqRef = ...;
+    uint32_t freq;
+    
+    /* Setup reference clock */
+    INPUTMUX_AttachSignal(INPUTMUX, EXAMPLE_REFERENCE_CLOCK_REGISTRY_INDEX, EXAMPLE_REFERENCE_CLOCK);
+
+    /* Setup to measure the selected target */
+    INPUTMUX_AttachSignal(INPUTMUX, EXAMPLE_TARGET_CLOCK_REGISTRY_INDEX, EXAMPLE_TARGET_CLOCK);
+
+    /* Start a measurement cycle and wait for it to complete. If the target
+       clock is not running, the measurement cycle will remain active
+       forever, so a timeout may be necessary if the target clock can stop. */
+    FMEAS_StartMeasure(SYSCON);
+    while (!FMEAS_IsMeasureComplete(SYSCON)) {}
+
+    /* Get computed frequency */
+    freq = FMEAS_GetFrequency(SYSCON, freqRef);
+~~~~~
+*/

@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.src.support" requires="devices.modules.DriverType_SRC"/>
+    <component name="platform.drivers.src.support.ip" requires="devices.modules.ssl_pele_ccmsrcmix_016"/>
+    <component name="platform.drivers.src.support.ip" requires="devices.modules.d_ssl_src_ultra_syn_003"/>
+    <component description="SRC Driver" name="platform.drivers.src" provides="platform.drivers" requires="platform.drivers.src.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_src.c"/>
+        <files mask="fsl_src.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

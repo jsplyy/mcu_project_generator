@@ -1,0 +1,53 @@
+/*!
+@defgroup sha SHA: SHA encryption decryption driver
+@details The KSDK provides a peripheral driver for the SHA module in LPC devices.
+
+The driver provides blocking synchronous APIs.
+The SHA operations are complete (and results are made availabe for further usage) when a function returns.
+When called, these functions don't return until a SHA operation is complete.
+These functions use main CPU for simple polling loops to determine operation complete or error status and also for data movements.
+The driver functions are not re-entrant.
+These functions provide typical interface to upper layer or application software.
+
+# SHA Driver Initialization and Configuration {#SHAInit}
+
+Clock to the SHA module has to be enabled before using the driver API.
+
+# Comments about API usage in RTOS {#SHARtos}
+
+SHA operations provided by this driver are not re-entrant. Thus, application software shall ensure
+the SHA module operation is not requested from different tasks or interrupt service routines while an operation is in progress.
+
+# SHA Driver Example {#SHAEx}
+
+Typical use case
+~~~~~{.c}
+	status_t status;
+	sha_ctx_t ctx;
+    uint8_t input[] = "Hello world.";
+    uint8_t output[32];
+    size_t outputSize;
+        
+	status = SHA_Init(SHA0, &ctx, kSHA_Sha256);
+    if (status != kStatus_Success)
+    {
+		/* fail */
+		return;
+	}
+	
+    status = SHA_Update(SHA0, &ctx, input, sizeof(input) - 1);
+	if (status != kStatus_Success)
+    {
+		/* fail */
+		return;
+	}
+    
+	outputSize = 32;
+    status = SHA_Finish(SHA0, &ctx, output, &outputSize);
+    if (status != kStatus_Success)
+    {
+		/* fail */
+		return;
+	}
+~~~~~
+*/

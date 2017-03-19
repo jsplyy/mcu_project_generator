@@ -1,0 +1,118 @@
+/*!
+@defgroup aes AES: AES encryption decryption driver
+@details The KSDK provides a peripheral driver for the AES module in LPC devices.
+
+The driver provides blocking synchronous APIs.
+The AES operations are complete (and results are made availabe for further usage) when a function returns.
+When called, these functions don't return until an AES operation is complete.
+These functions use main CPU for simple polling loops to determine operation complete or error status and also for plaintext or ciphertext data movements.
+The driver functions are not re-entrant.
+These functions provide typical interface to upper layer or application software.
+
+# AES Driver Initialization and Configuration {#AESInit}
+
+Clock to the AES module has to be enabled before using the driver API.
+The function AES_SetKey() has to be used to store encryption key into device registers prior to using other API.
+
+# Comments about API usage in RTOS {#AESRtos}
+
+AES operations provided by this driver are not re-entrant. Thus, application software shall ensure
+the AES module operation is not requested from different tasks or interrupt service routines while an operation is in progress.
+
+# AES Driver Examples {#AESEx}
+
+Encrypt plaintext and decrypt it back by AES engine
+~~~~~{.c}
+	status_t status;
+    uint8_t plain[16] = {0u};
+    uint8_t cipher[16];
+    uint8_t iv[AES_IV_SIZE] = {0u};
+    uint8_t key[16] = {0u};
+
+    memcpy(plain, "Hello World!", 12);
+    memcpy(iv, "initvectorinitve", 16);
+    memcpy(key, "__mykey1aa__^^..", 16);
+
+    status = AES_SetKey(AES0, key, 16);
+	if (status != kStatus_Success)
+	{
+		/* fail */
+		return;
+	}
+	
+	status = AES_EncryptCbc(AES0, plain, cipher, 16, iv);
+	if (status != kStatus_Success)
+	{
+		/* fail */
+		return;
+	}
+    
+    status = AES_DecryptCbc(AES0, cipher, plain, 16, iv);
+	if (status != kStatus_Success)
+	{
+		/* fail */
+		return;
+	}
+~~~~~
+
+Encrypts AES using CTR block mode.
+~~~~~{.c}
+	status_t status;	
+	const uint8_t key[] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+                           0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+	const uint8_t counter[16] = {0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
+                                 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff};
+	uint8_t plain[] = {0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96,
+                       0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a};
+	uint8_t cipher[16];
+    uint8_t iv[16];
+    
+    memset(cipher, 0, sizeof(cipher));
+    memcpy(iv, counter, 16);
+	
+	status = AES_SetKey(AES0, key, sizeof(key));
+	if (status != kStatus_Success)
+	{
+		/* fail */
+		return;
+	}
+	
+    status = AES_CryptCtr(AES0, plain, cipher, sizeof(plain), iv, NULL, NULL);
+	if (status != kStatus_Success)
+	{
+		/* fail */
+		return;
+	}
+    
+    memcpy(iv, counter, 16);
+    
+	status = AES_CryptCtr(AES0, cipher, plain, sizeof(cipher), iv, NULL, NULL);
+	if (status != kStatus_Success)
+	{
+		/* fail */
+		return;
+	}
+~~~~~
+
+Generation of GCM tag only
+~~~~~{.c}
+uint8_t key[16] = {0x0};
+uint8_t iv[12] = {0x0};
+uint8_t tag[16];
+status_t status;
+
+status = AES_SetKey(AES, key, sizeof(key));
+if (status != kStatus_Success)
+{
+	/* fail */
+	return;
+}
+
+status = AES_EncryptTagGcm(AES, NULL, NULL, 0U, iv, sizeof(iv), NULL, 0U, tag, sizeof(tag));
+if (status != kStatus_Success)
+{
+	/* fail */
+	return;
+}
+~~~~~
+*/

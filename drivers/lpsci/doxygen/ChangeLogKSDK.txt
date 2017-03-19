@@ -1,0 +1,25 @@
+/*!
+@page driver_log Driver Change Log
+
+@section lpsci LPSCI
+  Current LPSCI driver version is 2.0.3
+
+  - 2.0.0
+    - Initial version.
+
+  - 2.0.1
+    - Update baudrate code. Before setting baudrate, first check whether the
+      value is valid or not, if not valid, don't change baudrate and return.
+    - Remove needless check of event flags and assert in LPSCI_RTOS_Receive.
+    - Wait always for rx event flag in LPSCI_RTOS_Receive.
+
+  - 2.0.2
+    - Add rx framing error and parity error status check when use interrupt transfer.
+
+  - 2.0.3
+    - Change parameter type in LPSCI_RTOS_Init() struct rtos_lpsci_config --> lpsci_rtos_config_t.
+    - Bug fixed:
+      - Disable LPSCI receive interrupt instead of disable all NVIC when read data from ring buffer. 
+        Because with ring buffer used, receive nonblocking will disable all NVIC interrupts to protect 
+        the ring buffer, this will have negative effect to other IPS which are using interrupt.
+*/

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.fsp.support" requires="devices.modules.DriverType_QN_FSP"/>
+    <component description="FSP Driver" name="platform.drivers.qn_fsp" provides="platform.drivers" requires="platform.drivers.fsp.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_fsp.c"/>
+        <files mask="fsl_fsp.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>
+

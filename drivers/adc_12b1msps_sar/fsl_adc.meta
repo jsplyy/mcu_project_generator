@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.adc_12b1msps_sar.support" requires="devices.modules.DriverType_ADC"/>
+    <component name="platform.drivers.adc_12b1msps_sar.support.ip" requires="devices.modules.D_IP_ADC_12b1MSPS_SAR_c40LP_SYN_018"/>
+    <component description="ADC Driver" name="platform.drivers.adc_12b1msps_sar" provides="platform.drivers" requires="platform.drivers.adc_12b1msps_sar.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "ADC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_adc.c"/>
+        <files mask="fsl_adc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

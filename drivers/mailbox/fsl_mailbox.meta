@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.mailbox.support" requires="devices.modules.DriverType_LPC_MAILBOX"/>
+    <component description="MAILBOX Driver" name="platform.drivers.mailbox" provides="platform.drivers" requires="platform.drivers.mailbox.support platform.drivers.common" type="driver" version="2.0.0" full_name= "MAILBOX Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_mailbox.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

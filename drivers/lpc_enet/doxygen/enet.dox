@@ -1,0 +1,286 @@
+/*!
+@page drv_err Driver errors status
+ - #kStatus_ENET_RxFrameError = 4000
+ - #kStatus_ENET_RxFrameFail = 4001
+ - #kStatus_ENET_RxFrameEmpty = 4002
+ - #kStatus_ENET_TxFrameBusy = 4003
+ - #kStatus_ENET_TxFrameFail = 4004
+ - #kStatus_ENET_TxFrameOverLen = 4005
+ - #kStatus_ENET_PtpTsRingFull = 4006
+ - #kStatus_ENET_PtpTsRingEmpty = 4007
+*/
+
+/*!
+@defgroup lpc_enet ENET: Ethernet Driver
+@details The KSDK provides a peripheral driver for the 10/100 Mbps Ethernet (ENET)module of LPC devices.
+
+## Initialize and Deinitialize interface Operation {#ENETInitDeinitInterOps}
+Use the ENET_GetDefaultConfig() to get the default basic configuration,
+Use the default configuration unchanged or changed as the input to the 
+ENET_Init() to do basic configuration for ENET module.
+Call ENET_DescriptorInit() to intialization the descriptors and 
+Call ENET_StartRxTx() to start the ENET engine after all initialization.
+ENET_Deinit() is used to to ENET Deinitialization.
+
+## MII interface Operation {#ENETMIIInterOps}
+
+The MII interface is the interface connected with MAC and PHY.
+the Serial management interface - MII management interface should be set before any access
+to the external PHY chip register. Call ENET_SetSMI() to initialize MII management interface.
+Use ENET_StartSMIRead(), ENET_StartSMIWrite(), and ENET_ReadSMIData() to read/write to PHY registers, ENET_IsSMIBusy() to check the SMI busy status.
+This function group sets up the MII and serial management SMI interface, gets data from the SMI interface,
+and starts the SMI read and write command.
+Use ENET_SetMII() to configure the MII before successfully getting data from the external PHY.
+
+## Other basic operation {#ENETOthBasicOps}
+
+This group provides the ENET mac address set/get operation with ENET_SetMacAddr() and ENET_GetMacAddr(). The ENET_EnterPowerDown() and ENET_ExitPowerDown()
+can be used to do power management.
+
+## Interrupt operation {#ENETIntOps}
+This group provide the DMA interrupt get and clear APIs. This can be used
+by application to create new IRQ handler.
+
+## Functional Operation {#ENETFuncOps}
+This group functions are low level tx/rx descriptor operations.
+It is convenient to use these tx/rx APIs to do application specific rx/tx. 
+For TX: Use ENET_IsTxDescriptorDmaOwn(), ENET_SetupTxDescriptor() to build your packet for transfer
+and ENET_UpdateTxDescriptorTail to update the tx tail pointer.
+For RX: Use ENET_GetRxDescriptor() to get the received data/length and use
+the ENET_UpdateRxDescriptor() to update the buffers/status.
+
+## Transactional Operation {#ENETTransOps}
+When use the Transactional APIs, please make sure to call the ENET_CreateHandler
+to create the handler which are used to maintain all datas related to tx/tx
+process.
+
+For ENET receive, the ENET_GetRxFrameSize() function must be called to get the received data size. Then,
+call the ENET_ReadFrame() function to get the received data. 
+
+For ENET transmit, call the ENET_SendFrame() function to send the data out. 
+To save memory and avoid the memory copy in the TX process. The ENET_SendFrame()
+here is a zero-copy API, so make sure the input data buffers are not requeued or
+freed before the data are really sent out. To makesure the data buffers reclaim 
+is rightly done. the transmit interrupt must be used. so For transactional
+APIs here we enabled the tx interrupt in ENET_CreateHandler(). That means the
+tx interrupt is automatically enabled in transctional APIs. 
+is recommended to be called on the transmit interrupt handler.ENET_ReclaimTxDescriptor() is a transactional API to get the information
+from the finished transmit data buffers and reclaim the tx index. it is called
+by the transmit interrupt IRQ handler. 
+
+## PTP IEEE 1588 Feature Operation {#ENETPTP1588FeatureOps}
+
+All PTP 1588 fatures are enabled by define "ENET_PTP1588FEATURE_REQUIRED"
+This function group configures the PTP IEEE 1588 feature, starts/stops/gets/sets/corrects the PTP IEEE 1588 timer,
+gets the receive/transmit frame timestamp
+
+The ENET_GetRxFrameTime() and ENET_GetTxFrameTime() functions are called by the PTP stack to get the timestamp
+captured by the ENET driver.
+
+# Typical use case {#ENETTpyUC}
+
+## ENET Initialization, receive, and transmit operations {#ENETInitRxTxOps}
+
+For use the transactional APIs, receive polling
+~~~~~{.c}
+    enet_config_t config;
+    uint8_t index;
+    void *buff;
+    uint32_t refClock = 50000000; 
+    phy_speed_t speed;
+    phy_duplex_t duplex;
+    uint32_t length = 0;
+    uint8_t *buffer;
+    uint32_t timedelay;
+    status_t status;
+    bool link=false;
+
+    enet_buffer_config_t buffConfig = {
+        ENET_RXBD_NUM,       
+        ENET_TXBD_NUM,
+        &g_txBuffDescrip[0], 
+        &g_txBuffDescrip[0],
+        &g_rxBuffDescrip[0],
+        &g_rxBuffDescrip[ENET_RXBD_NUM],
+        &rxbuffer[0],       
+        ENET_BuffSizeAlign(ENET_RXBUFF_SIZE),
+    };
+
+    PHY_Init(EXAMPLE_ENET_BASE, EXAMPLE_PHY_ADDR, 0);
+
+    ENET_GetDefaultConfig(&config);
+
+    PHY_GetLinkSpeedDuplex(EXAMPLE_ENET_BASE, EXAMPLE_PHY_ADDR, &speed, &duplex);
+
+    config.miiSpeed = (enet_mii_speed_t)speed;
+    config.miiDuplex = (enet_mii_duplex_t)duplex;
+    config.interrupt = kENET_DmaTx;
+    ENET_Init(EXAMPLE_ENET_BASE, &config, &g_macAddr[0], refClock);
+    ENET_CreateHandler(EXAMPLE_ENET_BASE, &g_handle, &config, &buffConfig, ENET_IntCallback, NULL);
+    ENET_DescriptorInit(EXAMPLE_ENET_BASE, &config, &buffConfig);
+    ENET_StartRxTx(EXAMPLE_ENET_BASE, 1, 1);
+
+    ENET_BuildBroadCastFrame();
+
+    while (1)
+    {
+        status = ENET_GetRxFrameSize(EXAMPLE_ENET_BASE, &g_handle, &length, 0);
+        if ((status == kStatus_Success) && (length != 0))
+        {
+            uint8_t *data = (uint8_t *)malloc(length);
+            if (data)
+            {
+                status = ENET_ReadFrame(EXAMPLE_ENET_BASE, &g_handle, data, length, 0);
+                if (status == kStatus_Success)
+                {
+                    PRINTF(" One frame received. the length %d \r\n", length);
+                    PRINTF(" Dest Address %02x:%02x:%02x:%02x:%02x:%02x Src Address %02x:%02x:%02x:%02x:%02x:%02x \r\n",
+                           data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9],
+                           data[10], data[11]);
+                }
+                free(data);
+            }
+        }
+        else if (status == kStatus_ENET_RxFrameError)
+        {
+            ENET_ReadFrame(EXAMPLE_ENET_BASE, &g_handle, NULL, 0, 0);
+        }
+        if (g_testIdx < ENET_EXAMPLE_SEND_COUNT)
+        {
+            PHY_GetLinkStatus(EXAMPLE_ENET_BASE, EXAMPLE_PHY_ADDR, &link)
+            if (link)
+            {
+                buffer = (uint8_t *)malloc(ENET_EXAMPLE_FRAME_SIZE);
+                if (buffer)
+                {
+                    memcpy(buffer, &g_frame[g_txIdx], ENET_EXAMPLE_FRAME_SIZE);
+                    g_txIdx = (g_txIdx + 1) % ENET_EXAMPLE_PACKAGETYPE;
+                    g_txbuff[g_txbuffIdx] = buffer;
+                    g_txbuffIdx = (g_txbuffIdx + 1) % ENET_TXBD_NUM;
+
+                    if (kStatus_Success ==
+                        ENET_SendFrame(EXAMPLE_ENET_BASE, &g_handle, buffer, ENET_EXAMPLE_FRAME_SIZE))
+                    {
+                        g_testIdx++;
+                    }
+                }
+            }
+        }
+    }
+~~~~~
+
+For the functional API, rx polling
+~~~~~{.c}
+    static const IRQn_Type s_enetIrqId[] = ENET_IRQS;
+
+   enet_config_t config;
+    uint8_t index;
+    void *buff;
+    uint32_t refClock = 50000000; 
+    phy_speed_t speed;
+    phy_duplex_t duplex;
+    uint32_t length = 0;
+    uint8_t *buffer;
+    uint32_t data1, data2;
+    uint32_t timedelay;
+    bool link=false;
+
+    enet_buffer_config_t buffConfig = {
+        ENET_RXBD_NUM,       
+        ENET_TXBD_NUM,
+        &g_txBuffDescrip[0], 
+        &g_txBuffDescrip[0],
+        &g_rxBuffDescrip[0], 
+        &g_rxBuffDescrip[ENET_RXBD_NUM],
+        &rxbuffer[0],        
+        ENET_BuffSizeAlign(ENET_RXBUFF_SIZE),
+    };
+
+    PHY_Init(EXAMPLE_ENET_BASE, EXAMPLE_PHY_ADDR, 0);
+
+    ENET_GetDefaultConfig(&config);
+
+    PHY_GetLinkSpeedDuplex(EXAMPLE_ENET_BASE, EXAMPLE_PHY_ADDR, &speed, &duplex);
+    config.miiSpeed = (enet_mii_speed_t)speed;
+    config.miiDuplex = (enet_mii_duplex_t)duplex;
+    ENET_Init(EXAMPLE_ENET_BASE, &config, &g_macAddr[0], refClock);
+    
+    ENET_EnableInterrupts(ENET,  kENET_DmaTx);
+    EnableIRQ(ENET_EXAMPLE_IRQ);
+
+    ENET_DescriptorInit(EXAMPLE_ENET_BASE, &config, &buffConfig);
+
+    ENET_StartRxTx(EXAMPLE_ENET_BASE, 1, 1);
+
+    ENET_BuildBroadCastFrame();
+
+    while (1)
+    {
+        ENET_GetRxDescriptor(&g_rxBuffDescrip[g_rxGenIdx], &data1, &data2, &length);
+        if (length > 0)
+        {
+            g_rxGenIdx = (g_rxGenIdx + 1) % ENET_RXBD_NUM;
+
+            void *buffer1;
+            buffer1 = malloc(ENET_RXBUFF_SIZE);
+            if (buffer1)
+            {
+                ENET_UpdateRxDescriptor(&g_rxBuffDescrip[g_rxCosumIdx], buffer1, NULL, false, false);
+                g_rxCosumIdx = (g_rxCosumIdx + 1) % ENET_RXBD_NUM;
+            }
+
+            uint8_t *data = (uint8_t *)data1;
+            PRINTF(" One frame received. the length %d \r\n", length);
+            PRINTF(" Dest Address %02x:%02x:%02x:%02x:%02x:%02x Src Address %02x:%02x:%02x:%02x:%02x:%02x \r\n",
+                   data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10],
+                   data[11]);
+
+            free((void *)data1);
+        }
+
+        if (g_testIdx < ENET_EXAMPLE_SEND_COUNT)
+        {
+            PHY_GetLinkStatus(EXAMPLE_ENET_BASE, EXAMPLE_PHY_ADDR, &link)
+            if (link)
+            {
+                buffer = (uint8_t *)malloc(ENET_EXAMPLE_FRAME_SIZE);
+                if (buffer)
+                {
+                    memcpy(buffer, &g_frame[g_txIdx], ENET_EXAMPLE_FRAME_SIZE);
+                    g_txIdx = (g_txIdx + 1) % ENET_EXAMPLE_PACKAGETYPE;
+
+                    g_txbuff[g_txbuffIdx] = buffer;
+                    g_txbuffIdx = (g_txbuffIdx + 1) % ENET_TXBD_NUM;
+                    while (ENET_TXQueue(buffer, ENET_EXAMPLE_FRAME_SIZE) != kStatus_Success)
+                        ;
+                    g_testIdx++;
+                }
+            }
+        }
+    }
+
+static status_t ENET_TXQueue(uint8_t *data, uint16_t length)
+{
+    uint32_t txdescTailAddr;
+
+    if (ENET_IsTxDescriptorDmaOwn(&g_txBuffDescrip[g_txGenIdx]))
+    {
+        return kStatus_Fail;
+    }
+    ENET_SetupTxDescriptor(&g_txBuffDescrip[g_txGenIdx], data, length, NULL, 0, length, true, false, kENET_FirstLastFlag, 0);
+
+    g_txGenIdx = (g_txGenIdx + 1) % ENET_TXBD_NUM;
+    g_txUsed++;
+
+    txdescTailAddr = (uint32_t)&g_txBuffDescrip[g_txGenIdx];
+    if (!g_txGenIdx)
+    {
+        txdescTailAddr = (uint32_t)&g_txBuffDescrip[ENET_TXBD_NUM];
+    }
+    ENET_UpdateTxDescriptorTail(EXAMPLE_ENET_BASE, 0, txdescTailAddr);
+    return kStatus_Success;
+}
+~~~~~
+
+
+*/

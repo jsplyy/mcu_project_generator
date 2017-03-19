@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.flexspi.support" requires="devices.modules.DriverType_FLEXSPI"/>
+    <component name="platform.drivers.flexspi.support.ip" requires="devices.modules.D_IP_FLEXSPI_SYN_008"/>
+    <component description="FLEXSPI Driver" name="platform.drivers.flexspi" provides="platform.drivers" requires="platform.drivers.flexspi.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name="FLEXSPI Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_flexspi.c"/>
+        <files mask="fsl_flexspi.h"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_flexspi_edma.c" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_flexspi_edma.h" requires="platform.drivers.edma"/>
+      </source>
+    </component>
+  </components>
+</metadata>

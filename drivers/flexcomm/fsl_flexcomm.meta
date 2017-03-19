@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.flexcomm.support" requires="devices.modules.DriverType_LPC_FLEXCOMM"/>
+    <component description="FLEXCOMM Driver" name="platform.drivers.flexcomm" provides="platform.drivers" requires="platform.drivers.power platform.drivers.reset platform.drivers.common platform.drivers.flexcomm.support" type="driver" version="2.0.0" full_name= "FLEXCOMM Driver">
+      <source path="./" requires="devices.modules.DriverType_LPC_FLEXCOMM">
+        <files mask="*.meta"/>
+        <files mask="fsl_flexcomm.c"/>
+        <files mask="fsl_flexcomm.h"/>
+      </source> 
+    </component>            
+    <component name="platform.drivers.lpc_i2c.support" requires="devices.modules.DriverType_LPC_I2C"/>    
+    <component description="I2C Driver" name="platform.drivers.lpc_i2c" provides="platform.drivers" requires="platform.drivers.common platform.drivers.flexcomm.support platform.drivers.lpc_i2c.support" type="driver" version="2.0.0" full_name= "FLEXCOMM Driver">
+      <source path="./" requires="devices.modules.DriverType_LPC_I2C">
+        <files mask="fsl_i2c.c"/>
+        <files mask="fsl_i2c.h"/>
+        <files mask="fsl_i2c_dma.c"/>
+        <files mask="fsl_i2c_dma.h"/>
+        <files mask="fsl_i2c_freertos.c"/>
+        <files mask="fsl_i2c_freertos.h"/>
+      </source> 
+    </component>
+    <component name="platform.drivers.lpc_i2s.support" requires="devices.modules.DriverType_LPC_I2S"/>
+    <component description="I2S Driver" name="platform.drivers.lpc_i2s" provides="platform.drivers" requires="platform.drivers.common platform.drivers.flexcomm.support platform.drivers.lpc_i2s.support" type="driver" version="2.0.0" full_name= "FLEXCOMM Driver">
+      <source path="./" requires="devices.modules.DriverType_LPC_I2S">
+        <files mask="fsl_i2s.c"/>
+        <files mask="fsl_i2s.h"/>
+        <files mask="fsl_i2s_dma.c"/>
+        <files mask="fsl_i2s_dma.h"/>
+      </source>
+    </component>
+    <component name="platform.drivers.lpc_spi.support" requires="devices.modules.DriverType_LPC_SPI"/>
+    <component description="SPI Driver" name="platform.drivers.lpc_spi" provides="platform.drivers" requires="platform.drivers.common platform.drivers.flexcomm.support platform.drivers.lpc_spi.support" type="driver" version="2.0.0" full_name= "FLEXCOMM Driver">
+      <source path="./" requires="devices.modules.DriverType_LPC_SPI">
+        <files mask="fsl_spi.c"/>
+        <files mask="fsl_spi.h"/>
+        <files mask="fsl_spi_dma.c"/>
+        <files mask="fsl_spi_dma.h"/>
+      </source>
+     <source path="./" requires="devices.modules.DriverType_LPC_SPI" condition="middleware.freertos">
+        <files mask="fsl_spi_freertos.c" requires="middleware.freertos"/>
+     </source>
+     <source path="./" requires="devices.modules.DriverType_LPC_SPI" condition="middleware.freertos">
+        <files mask="fsl_spi_freertos.h" requires="middleware.freertos"/>
+     </source>
+     <source path="./" requires="devices.modules.DriverType_LPC_SPI" condition="middleware.freertos">
+        <files mask="fsl_spi_prv.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+    <component name="platform.drivers.lpc_usart.support" requires="devices.modules.DriverType_LPC_USART"/>
+    <component description="USART Driver" name="platform.drivers.lpc_usart" provides="platform.drivers" requires="platform.drivers.common platform.drivers.flexcomm.support platform.drivers.lpc_usart.support" type="driver" version="2.0.0" full_name= "FLEXCOMM Driver">
+      <source path="./" requires="devices.modules.DriverType_LPC_USART">
+        <files mask="fsl_usart.c"/>
+        <files mask="fsl_usart.h"/>
+        <files mask="fsl_usart_dma.c"/>
+        <files mask="fsl_usart_dma.h"/>
+      </source>
+      <source path="./" requires="devices.modules.DriverType_LPC_USART" condition="middleware.freertos">
+        <files mask="fsl_usart_freertos.c" requires="middleware.freertos"/>
+      </source>
+      <source path="./" requires="devices.modules.DriverType_LPC_USART" condition="middleware.freertos">
+        <files mask="fsl_usart_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

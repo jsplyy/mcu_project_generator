@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.uart.support" requires="devices.modules.DriverType_UART"/>
+    <component name="platform.drivers.uart.support.ip" requires="devices.modules.D_IP_HiSpd_SCI_SYN_022"/>
+    <component name="platform.drivers.uart.support.ip" requires="devices.modules.D_IP_HiSpd_SCI_SYN_011"/>
+    <component name="platform.drivers.uart.support.ip" requires="devices.modules.D_IP_HiSpd_SCI_SYN_013"/>
+    <component name="platform.drivers.uart.support.ip" requires="devices.modules.D_IP_HiSpd_SCI_SYN_024"/>
+    <component name="platform.drivers.uart.support.ip" requires="devices.modules.D_IP_HiSpd_SCI_SYN_019"/>
+    <component name="platform.drivers.uart.support.ip" requires="devices.modules.D_IP_HiSpd_SCI_SYN_025"/>
+    <component description="UART Driver" name="platform.drivers.uart" provides="platform.drivers" requires="platform.drivers.uart.support platform.drivers.common" type="driver" version="2.1.4" change_log="./doxygen/ChangeLogKSDK.txt" full_name="UART Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_uart.c"/>
+        <files mask="fsl_uart.h"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_uart_dma.c" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_uart_dma.h" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_uart_edma.c" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_uart_edma.h" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_uart_freertos.c" requires="middleware.freertos"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_uart_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

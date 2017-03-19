@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.tsc.support" requires="devices.modules.DriverType_TSC"/>
+    <component description="TSC Driver" name="platform.drivers.tsc" provides="platform.drivers" requires="platform.drivers.tsc.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_tsc.c"/>
+        <files mask="fsl_tsc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

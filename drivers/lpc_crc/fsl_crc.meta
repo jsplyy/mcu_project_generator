@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.crc.support" requires="devices.modules.DriverType_LPC_CRC"/>
+    <component description="CRC Driver" name="platform.drivers.crc" provides="platform.drivers" requires="platform.drivers.crc.support platform.drivers.common" type="driver" version="2.0.0" full_name= "CRC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_crc.h"/>
+        <files mask="fsl_crc.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

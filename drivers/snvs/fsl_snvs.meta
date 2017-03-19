@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.snvs.support" requires="devices.modules.DriverType_SNVS"/>
+    <component name="platform.drivers.snvs.support.ip" requires="devices.modules.snvs_imx_shp_008"/>
+    <component description="SNVS Driver" name="platform.drivers.snvs" provides="platform.drivers" requires="platform.drivers.snvs.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "SNVS Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_snvs.c"/>
+        <files mask="fsl_snvs.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

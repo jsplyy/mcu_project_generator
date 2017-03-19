@@ -1,0 +1,12 @@
+/*!
+@defgroup eeprom EEPROM: EEPROM memory driver
+@details The KSDK provides a peripheral driver for the eeprom module of Lpc devices.
+
+# Typical use case {#eepromTypUC}
+~~~~~{.c}
+    eeprom_config_t config;
+    eeprom_GetDefaultConfig(&config);
+    eeprom_Init(base, &config);
+    eeprom_WritePage(base, pageNum, data);
+~~~~~
+*/

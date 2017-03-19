@@ -1,0 +1,39 @@
+/*!
+@page driver_log Driver Change Log
+
+@section sdhc SDHC
+  Current SDHC driver version is 2.1.1
+
+  - 2.1.0
+    - New Features:
+      - Add a host descriptor to contain SDHC related attributes;
+    - Bug Fix:
+      - Remove clock auto gated function because of that it is a hardware issue;
+    - Other changes:
+      - Add more SDIO card related command type;
+      - Change the callback mechanism in the non-blocking transaction API;
+      - Merge the two ADMA configuration function to be one;
+      - Change the transaction API's name;
+
+  - 2.1.1
+    - Bug Fix:
+      - Fix the compile error when ADMA1 is enabled;
+
+  - 2.1.2
+    - Bug Fix:
+      - use function pointer for interrupt handler to reduce code size.
+      - Bad status bit check behaviour when wait for initialization of SD card.
+      - Add support NON-WORD aligned data size transfer mode for SDIO card.
+      
+  - 2.1.3
+    - Modify some define for compatible with middleware adapter
+
+  - 2.1.4
+    - New Features:
+      - Add response error flag to check response once read from the card
+    - Bug Fix:
+    - Fix clock divider calucate not correct issue
+  - 2.1.5
+    -New Feature:
+      - Add NON-WORD align data addr transfer support in DMA mode
+*/

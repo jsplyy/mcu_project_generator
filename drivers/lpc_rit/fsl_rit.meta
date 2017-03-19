@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.rit.support" requires="devices.modules.DriverType_LPC_RIT"/>
+    <component description="RIT Driver" name="platform.drivers.rit" provides="platform.drivers" requires="platform.drivers.rit.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "RIT Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_rit.c"/>
+        <files mask="fsl_rit.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

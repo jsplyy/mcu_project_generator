@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.irqsteer.support" requires="devices.modules.DriverType_IRQSTEER"/>
+    <component name="platform.drivers.irqsteer.support.ip" requires="devices.modules.D_IP_IRQSTEER"/>
+    <component description="IRQSTEER Driver" name="platform.drivers.irqsteer" provides="platform.drivers" requires="platform.drivers.irqsteer.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "IRQSTEER Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_irqsteer.c"/>
+        <files mask="fsl_irqsteer.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

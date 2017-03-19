@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.isi.support" requires="devices.modules.DriverType_ISI"/>
+    <component name="platform.drivers.isi.support.ip" requires="devices.modules.TODO"/>
+    <component description="ISI Driver" name="platform.drivers.isi" provides="platform.drivers" requires="platform.drivers.isi.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_isi.c"/>
+        <files mask="fsl_isi.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

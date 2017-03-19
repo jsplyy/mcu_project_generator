@@ -1,0 +1,90 @@
+/*!
+@defgroup  adc_12b1msps_sar ADC: 12-bit Analog to Digital Converter Driver
+@details The SDK provides Peripheral driver for the 12-bit Analog to Digital Converter (ADC) 
+         module of Kinetis devices.
+
+# Typical use case {#ADCTpyUC}
+
+## Polling Configuration {#ADCIntConfig}
+
+~~~~~{.c}
+    volatile bool g_AdcConversionDoneFlag;
+    volatile uint32_t g_AdcConversionValue;
+    volatile uint32_t g_AdcInterruptCounter;
+
+    // ...
+    
+    adc_config_t adcConfigStrcut;
+    adc_channel_config_t adcChannelConfigStruct;
+
+    ADC_GetDefaultConfig(&adcConfigStrcut);
+    ADC_Init(DEMO_ADC_BASE, &adcConfigStrcut);
+    ADC_EnableHardwareTrigger(DEMO_ADC_BASE, false);
+    if (kStatus_Success == ADC_DoAutoCalibration(DEMO_ADC_BASE))
+    {
+        PRINTF("ADC_DoAntoCalibration() Done.\r\n");
+    }
+    else
+    {
+        PRINTF("ADC_DoAutoCalibration() Failed.\r\n");
+    }
+    adcChannelConfigStruct.channelNumber = DEMO_ADC_USER_CHANNEL;
+    adcChannelConfigStruct.enableInterruptOnConversionCompleted = true;
+    g_AdcInterruptCounter = 0U;
+    
+    while (1)
+    {
+        PRINTF("Press any key to get user channel's ADC value.\r\n");
+        GETCHAR();
+        g_AdcConversionDoneFlag = false;
+        ADC_SetChannelConfig(DEMO_ADC_BASE, DEMO_ADC_CHANNEL_GROUP, &adcChannelConfigStruct);
+        while (g_AdcConversionDoneFlag == false)
+        {
+        }
+        PRINTF("ADC Value: %d\r\n", g_AdcConversionValue);
+        PRINTF("ADC Interrupt Counter: %d\r\n", g_AdcInterruptCounter);
+    }
+
+    // ...
+    
+    void DEMO_ADC_IRQ_HANDLER_FUNC(void)
+    {
+        g_AdcConversionDoneFlag = true;
+        g_AdcConversionValue = ADC_GetChannelConversionValue(DEMO_ADC_BASE, DEMO_ADC_CHANNEL_GROUP);
+        g_AdcInterruptCounter++;
+    }
+~~~~~
+
+## Polling Configuration {#ADCPolConfig}
+
+~~~~~{.c}
+    adc_config_t adcConfigStrcut;
+    adc_channel_config_t adcChannelConfigStruct;
+    
+    ADC_GetDefaultConfig(&adcConfigStrcut);
+    ADC_Init(DEMO_ADC_BASE, &adcConfigStrcut);
+    ADC_EnableHardwareTrigger(DEMO_ADC_BASE, false);
+    if (KStatus_Success == ADC_DoAutoCalibration(DEMO_ADC_BASE))
+    {
+        PRINTF("ADC_DoAntoCalibration() Done.\r\n");
+    }
+    else
+    {
+        PRINTF("ADC_DoAutoCalibration() Failed.\r\n");
+    }
+    adcChannelConfigStruct.channelNumber = DEMO_ADC_USER_CHANNEL;
+    adcChannelConfigStruct.enableInterruptOnConversionCompleted = false;
+
+    while (1)
+    {
+        PRINTF("Press any key to get user channel's ADC value.\r\n");
+        GETCHAR();
+        ADC_SetChannelConfig(DEMO_ADC_BASE, DEMO_ADC_CHANNEL_GROUP, &adcChannelConfigStruct);
+        while (0U == ADC_GetChannelStatusFlags(DEMO_ADC_BASE, DEMO_ADC_CHANNEL_GROUP))
+        {
+        }
+        PRINTF("ADC Value: %d\r\n", ADC_GetChannelConversionValue(DEMO_ADC_BASE, DEMO_ADC_CHANNEL_GROUP));
+    }
+~~~~~
+
+*/

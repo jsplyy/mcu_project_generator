@@ -1,0 +1,97 @@
+/*!
+@page driver_log Driver Change Log
+
+@section flexio FLEXIO
+  Current FLEXIO driver version is 2.0.1
+
+  - 2.0.1
+    - Bug fix:
+      - Fix the Dozen mode configuration error in FLEXIO_Init API. For enableInDoze = true, the configuration shoud be
+        0; for enableInDoze = false, the configuration should be 1.
+
+@section flexio_uart FLEXIO_UART
+  Current FLEXIO_UART driver version is 2.1.2
+
+  - 2.1.0
+    - New Features:
+      - Add Transfer prefix in transactional APIs
+      - Add txSize/rxSize in handle structure to record the transfer size 
+    - Bug Fix:
+      - Add error handle to handle the data count is zero or data buffer is NULL situation
+  - 2.1.1
+    - Bug Fix:
+      - Change the API name FLEXIO_UART_StopRingBuffer to FLEXIO_UART_TransferStopRingBuffer to align 
+        with the definition in C file
+  - 2.1.2
+    - Bug Fix:
+      - Fix the transfer count calculation issue in FLEXIO_UART_TransferGetReceiveCount, FLEXIO_UART_TransferGetSendCount,
+        FLEXIO_UART_TransferGetReceiveCountDMA, FLEXIO_UART_TransferGetSendCountDMA, FLEXIO_UART_TransferGetReceiveCountEDMA 
+        and FLEXIO_UART_TransferGetSendCountEDMA
+      - Fix the Dozen mode configuration error in FLEXIO_UART_Init API. For enableInDoze = true, the configuration shoud be
+        0; for enableInDoze = false, the configuration should be 1.
+      - Report error when set baudrate too low and FLEXIO cannot reach that baudrate.
+      - Disable FLEXIO_UART receive interrupt instead of disable all NVIC when read data from ring buffer. 
+        Because with ring buffer used, receive nonblocking will disable all NVIC interrupts to protect 
+        the ring buffer, this will have negative effect to other IPS which are using interrupt.
+
+@section flexio_i2c FLEXIO_I2C
+  Current FLEXIO_I2C driver version is 2.1.2
+
+  - 2.1.0
+    - New Features:
+      - Add Transfer prefix in transactional APIs
+      - Add transferSize in handle structure to record the transfer size
+  - 2.1.1
+    - Bug Fix:
+      - Implement the FLEXIO_I2C_MasterTransferBlocking API which defined in header flie but has no 
+        implementation in C file
+  - 2.1.2
+      - Fix the FLEXIO I2C master can not receive data from i2c slave in high baudrate issue
+      - Fix the FLEXIO I2C master can not receive NAK when master send non exist addr issue
+      - Fix the FLEXIO I2C master can not get transfer count successfully issue
+      - Fix the FLEXIO I2C master can not receive data successfully when send data first issue
+      - Fix the Dozen mode configuration error in FLEXIO_I2C_MasterInit API. For enableInDoze = true, the configuration shoud be
+        0; for enableInDoze = false, the configuration should be 1.
+      - Fix the FLEXIO_I2C_MasterTransferBlocking API calls FLEXIO_I2C_MasterTransferCreateHandle issue, this leads the 
+        s_flexioHandle/s_flexioIsr/s_flexioType variable written, then if call FLEXIO_I2C_MasterTransferBlocking API multiple times,
+        the s_flexioHandle/s_flexioIsr/s_flexioType variable cannot be written anymore due to out of range, this will lead the following 
+        NonBlocking transfer APIs can not work due to register IRQ failed.
+
+@section flexio_spi FLEXIO_SPI
+  Current FLEXIO_SPI driver version is 2.1.1
+
+  - 2.1.0
+    - New Features:
+      - Add Transfer prefix in transactional APIs
+      - Add transferSize in handle structure to record the transfer size
+    - Bug Fix:
+      - Fix the error register address return for 16-bit data write in FLEXIO_SPI_GetTxDataRegisterAddress
+      - Provide independent IRQHandler/transfer APIs for Master and slave to fix the baudrate limit issue
+  - 2.1.1
+    - Bug Fix:
+      - Fix the bug when FLEXIO SPI transfer data in 16 bit per frame mode with edma
+      - Fix the bug when FLEXIO SPI transfer data in 16 bit per frame and direction is Lsbfirst mode with edma and interrupt
+      - Fix the Dozen mode configuration error in FLEXIO_SPI_MasterInit/FLEXIO_SPI_SlaveInit API. For enableInDoze = true, 
+        the configuration shoud be 0; for enableInDoze = false, the configuration should be 1.
+    - Optimization:
+      - Add #ifndef/#endif to allow user to change the default tx value at compile time.
+
+@section flexio_i2s FLEXIO_I2S
+  Current FLEXIO_I2S driver version is 2.1.1
+
+  - 2.1.0
+    - New Features:
+      - Add Transfer prefix in transactional APIs
+      - Add transferSize in handle structure to record the transfer size
+  - 2.1.1
+    - Bug Fix:
+      - Fix flexio i2s rx data read error and edma address error.
+      - Fix flexio i2s slave timer compare setting error.
+
+@section flexio_mculcd FLEXIO_MCU_LCD
+  Current FLEXIO_MCU_LCD driver version is 2.0.0
+
+  - 2.0.0
+    - Initial version.
+
+*/

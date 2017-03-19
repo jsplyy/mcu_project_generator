@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.ecspi.support" requires="devices.modules.DriverType_ECSPI"/>
+    <component description="ECSPI Driver" name="platform.drivers.ecspi" provides="platform.drivers" requires="platform.drivers.ecspi.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_ecspi.c"/>
+        <files mask="fsl_ecspi.h"/>
+        <files mask="fsl_ecspi_freertos.c" requires="middleware.freertos"/>
+        <files mask="fsl_ecspi_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

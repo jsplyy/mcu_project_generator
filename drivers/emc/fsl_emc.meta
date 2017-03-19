@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.emc.support" requires="devices.modules.DriverType_LPC_EMC"/>
+    <component name="platform.drivers.emc" description="EMC Driver" requires="platform.drivers.emc.support platform.drivers.common" provides="platform.drivers" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "EMC Driver">
+      <source path=".">
+        <files mask="*.meta"/>
+        <files mask="fsl_emc.c"/>
+        <files mask="fsl_emc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

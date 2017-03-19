@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.gpt.support" requires="devices.modules.DriverType_GPT"/>
+    <component description="GPT Driver" name="platform.drivers.gpt" provides="platform.drivers" requires="platform.drivers.gpt.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_gpt.h"/>
+        <files mask="fsl_gpt.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

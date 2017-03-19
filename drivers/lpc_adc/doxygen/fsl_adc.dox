@@ -1,0 +1,160 @@
+/*!
+@defgroup lpc_adc ADC: 12-bit SAR Analog-to-Digital Converter Driver
+@details The SDK provides a Peripheral driver for the 12-bit SAR Analog-to-Digital Converter (ADC)
+         module of LPC devices.
+
+# Typical use case {#LPCADCTpyUC}
+
+## Polling Configuration {#LPCADCPolConfig}
+
+~~~~~{.c}
+
+    void main(void)
+    {
+        adc_config_t adcConfigStruct;
+        adc_conv_seq_config_t adcConvSeqConfigStruct;
+
+        /* Enable the power and clock firstly. */
+        ...
+
+        /* Calibration. */
+        if (ADC_DoSelfCalibration(DEMO_ADC_BASE))
+        {
+            PRINTF("ADC_DoSelfCalibration() Done.\r\n");
+        }
+        else
+        {
+            PRINTF("ADC_DoSelfCalibration() Failed.\r\n");
+        }
+
+        /* Configure the converter. */
+        adcConfigStruct.clockMode = kADC_ClockSynchronousMode;
+        adcConfigStruct.clockDividerNumber = 0;
+        adcConfigStruct.resolution = kADC_Resolution12bit;
+        adcConfigStruct.enableBypassCalibration = false;
+        adcConfigStruct.sampleTimeNumber = 0U;
+        ADC_Init(DEMO_ADC_BASE, &adcConfigStruct);
+
+        /* Use the temperature sensor input to channel 0. */
+        ADC_EnableTemperatureSensor(DEMO_ADC_BASE, true);
+
+        /* Enable channel 0's conversion in Sequence A. */
+        adcConvSeqConfigStruct.channelMask = (1U << 0); /* Includes channel 0. */
+        adcConvSeqConfigStruct.triggerMask = 0U;
+        adcConvSeqConfigStruct.triggerPolarity = kADC_TriggerPolarityNegativeEdge;
+        adcConvSeqConfigStruct.enableSingleStep = false;
+        adcConvSeqConfigStruct.enableSyncBypass = false;
+        adcConvSeqConfigStruct.interruptMode = kADC_InterruptForEachSequence;
+        ADC_SetConvSeqAConfig(DEMO_ADC_BASE, &adcConvSeqConfigStruct);
+        ADC_EnableConvSeqA(DEMO_ADC_BASE, true); /* Enable the conversion sequence A. */
+
+        PRINTF("Configuration Done.\r\n");
+
+        while (1)
+        {
+            /* Get the input from terminal and trigger the converter by software. */
+            GETCHAR();
+            ADC_DoSoftwareTriggerConvSeqA(DEMO_ADC_BASE);
+
+            /* Wait for the converter to be done. */
+            while (!ADC_GetChannelConversionResult(DEMO_ADC_BASE, DEMO_ADC_SAMPLE_CHANNEL_NUMBER, &adcResultInfoStruct))
+            {
+            }
+            PRINTF("adcResultInfoStruct.result        = %d\r\n", adcResultInfoStruct.result);
+            PRINTF("adcResultInfoStruct.channelNumber = %d\r\n", adcResultInfoStruct.channelNumber);
+            PRINTF("adcResultInfoStruct.overrunFlag   = %d\r\n", adcResultInfoStruct.overrunFlag ? 1U : 0U);
+            PRINTF("\r\n");
+        }
+    }
+
+~~~~~
+
+## Interrupt Configuration {#ADC16IntConfig}
+
+~~~~~{.c}
+    
+    /* Global variables. */
+    static adc_result_info_t gAdcResultInfoStruct;
+    adc_result_info_t *volatile gAdcResultInfoPtr = &gAdcResultInfoStruct;
+    volatile bool gAdcConvSeqAIntFlag;
+    
+    void main(void)
+    {
+        adc_config_t adcConfigStruct;
+        adc_conv_seq_config_t adcConvSeqConfigStruct;
+
+        /* Enable the power and clock firstly. */
+        ...
+
+        /* Calibration. */
+        if (ADC_DoSelfCalibration(DEMO_ADC_BASE))
+        {
+            PRINTF("ADC_DoSelfCalibration() Done.\r\n");
+        }
+        else
+        {
+            PRINTF("ADC_DoSelfCalibration() Failed.\r\n");
+        }
+
+        /* Configure the ADC as basic polling mode. */
+        /* Configure the converter. */
+        adcConfigStruct.clockMode = kADC_ClockSynchronousMode;
+        adcConfigStruct.clockDividerNumber = 0;
+        adcConfigStruct.resolution = kADC_Resolution12bit;
+        adcConfigStruct.enableBypassCalibration = false;
+        adcConfigStruct.sampleTimeNumber = 0U;
+        ADC_Init(DEMO_ADC_BASE, &adcConfigStruct);
+
+        /* Use the sensor input to channel 0. */
+        ADC_EnableTemperatureSensor(DEMO_ADC_BASE, true);
+
+        /* Enable channel 0's conversion in Sequence A. */
+        adcConvSeqConfigStruct.channelMask = (1U << 0); /* Includes channel 0. */
+        adcConvSeqConfigStruct.triggerMask = 0U;
+        adcConvSeqConfigStruct.triggerPolarity = kADC_TriggerPolarityNegativeEdge;
+        adcConvSeqConfigStruct.enableSingleStep = false;
+        adcConvSeqConfigStruct.enableSyncBypass = false;
+        adcConvSeqConfigStruct.interruptMode = kADC_InterruptForEachSequence;
+        ADC_SetConvSeqAConfig(DEMO_ADC_BASE, &adcConvSeqConfigStruct);
+        ADC_EnableConvSeqA(DEMO_ADC_BASE, true); /* Enable the conversion sequence A. */
+
+        /* Enable the interrupt. */
+        ADC_EnableInterrupts(DEMO_ADC_BASE,
+                             kADC_ConvSeqAInterruptEnable); /* Enable the interrupt the for sequence A done. */
+        NVIC_EnableIRQ(DEMO_ADC_IRQ_ID);
+
+        PRINTF("Configuration Done.\r\n");
+
+        while (1)
+        {
+            GETCHAR();
+            gAdcConvSeqAIntFlag = false;
+            ADC_DoSoftwareTriggerConvSeqA(DEMO_ADC_BASE);
+
+            while (!gAdcConvSeqAIntFlag)
+            {
+            }
+            PRINTF("gAdcResultInfoStruct.result        = %d\r\n", gAdcResultInfoStruct.result);
+            PRINTF("gAdcResultInfoStruct.channelNumber = %d\r\n", gAdcResultInfoStruct.channelNumber);
+            PRINTF("gAdcResultInfoStruct.overrunFlag   = %d\r\n", gAdcResultInfoStruct.overrunFlag ? 1U : 0U);
+            PRINTF("\r\n");
+        }
+    }
+
+    /*
+     * ISR for ADC conversion sequence A done.
+     */
+    void DEMO_ADC_IRQ_HANDLER_FUNC(void)
+    {
+        if (kADC_ConvSeqAInterruptFlag == (kADC_ConvSeqAInterruptFlag & ADC_GetStatusFlags(DEMO_ADC_BASE)))
+        {
+            ADC_GetChannelConversionResult(DEMO_ADC_BASE, DEMO_ADC_SAMPLE_CHANNEL_NUMBER, gAdcResultInfoPtr);
+            ADC_ClearStatusFlags(DEMO_ADC_BASE, kADC_ConvSeqAInterruptFlag);
+            gAdcConvSeqAIntFlag = true;
+        }
+    }
+
+~~~~~
+
+*/
+

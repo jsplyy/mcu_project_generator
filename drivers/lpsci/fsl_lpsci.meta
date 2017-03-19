@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.lpsci.support" requires="devices.modules.DriverType_LPSCI"/>
+    <component name="platform.drivers.lpsci.support.ip" requires="devices.modules.D_IP_SCI_SYN_015"/>
+    <component name="platform.drivers.lpsci.support.ip" requires="devices.modules.D_IP_SCI_SYN_016"/>
+    <component description="LPSCI Driver" name="platform.drivers.lpsci" provides="platform.drivers" requires="platform.drivers.lpsci.support platform.drivers.common" type="driver" version="2.0.3" change_log="./doxygen/ChangeLogKSDK.txt" full_name="LPSCI Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_lpsci.c"/>
+        <files mask="fsl_lpsci.h"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_lpsci_dma.c" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="platform.drivers.dma">
+        <files mask="fsl_lpsci_dma.h" requires="platform.drivers.dma"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_lpsci_freertos.c" requires="middleware.freertos"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_lpsci_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

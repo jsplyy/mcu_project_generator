@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.dryice_digital.support" requires="devices.modules.DriverType_DryIce"/>
+    <component name="platform.drivers.dryice_digital.support.ip" requires="devices.modules.ipv_dryice_digital_002"/>
+    <component description="DRYICE DIGITAL Driver" name="platform.drivers.dryice_digital" provides="platform.drivers" requires="nda platform.drivers.dryice_digital.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "DRYICE DIGITAL Driver">
+      <source path="./">
+        <files mask="fsl_dryice_digital.meta"/>
+        <files mask="fsl_dryice_digital.c"/>
+        <files mask="fsl_dryice_digital.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

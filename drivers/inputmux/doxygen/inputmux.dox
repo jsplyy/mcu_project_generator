@@ -1,0 +1,21 @@
+/*!
+@defgroup inputmux_driver INPUTMUX: Input Multiplexing Driver
+
+@details The SDK provides a driver for the Input multiplexing (INPUTMUX).
+ @n
+It configures the inputs to the pin interrupt block, DMA trigger and the frequency measure function. Once
+configured the clock is not needed for the inputmux.
+ @n
+
+# Input Multiplexing Driver operation {#INPUTMUXInit}
+
+INPUTMUX_AttachSignal function configures the specified input
+
+# Typical use case {#INPUTMUXTypUC}
+~~~~~{.c}
+    INPUTMUX_Init(INPUTMUX);
+    INPUTMUX_AttachSignal(INPUT_MUX, kPINT_PinInt0, kINPUTMUX_GpioPort0Pin0ToPintsel);
+	/* Disable clock to save power */
+    INPUTMUX_Deinit(INPUTMUX)
+~~~~~
+*/

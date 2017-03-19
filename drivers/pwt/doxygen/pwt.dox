@@ -1,0 +1,127 @@
+/*!
+@defgroup pwt_driver PWT: Pulse Width Timer
+@details The KSDK provides a driver for the Pulse Width Timer (PWT)
+         of Kinetis devices.
+
+# Function groups {#PWTFunc}
+The PWT driver supports capture or measure the pulse width mapping on its input channels. 
+The counter of PWT has two selectable clock sources, and supports up to BUS_CLK
+with internal timer clock. PWT module supports programmable positive or negative pulse
+edges, and programmable interrupt generation upon pulse width values or counter
+overflow.
+
+
+## Initialization and deinitialization {#PWTInit&PWTDeinit}
+The function PWT_Init() initializes the PWT with specified configurations. The function
+PWT_GetDefaultConfig() gets the default configurations. The initialization function 
+configures the PWT for the requested register update mode for register with buffers.
+
+The function PWT_Deinit() disables the PWT counter and turns off the module clock.
+## Reset {#PWT_Reset}
+The function PWT_Reset() is built into PWT as a mechanism used to reset/restart the pulse width timer.
+## Status {#PWTStatus}
+Provides functions to get and clear the PWT status.
+## Interrupt {#PWTInterrupt}
+Provides functions to enable/disable PWT interrupts and get current enabled interrupts.
+## Start & Stop timer {#PWTStart}
+The function PWT_StartTimer() starts the PWT time counter.
+
+The function PWT_StopTimer() stops the PWT time counter.
+## GetInterrupt {#PWTGetInterrupt}
+Provides functions to generate Overflow/Pulse Width Data Ready Interrupt.
+## Get Timer value {#PWTGetTimervalue}
+The function PWT_GetCurrentTimerCount() is set to read the current counter value.
+
+The function PWT_ReadPositivePulseWidth() is set to read the positive pulse width.
+
+The function PWT_ReadNegativePulseWidth() is set to read the negative pulse width.
+## PWT Operations {#PWTOperation}
+## Input capture operations
+The input capture operations sets up an channel for input capture.
+
+The function EdgeCapture can be used to measure the pulse width of a signal. 
+A channel is used during capture with the input signal coming through a channel n. 
+The capture edge for each channel, and any filter value to be used when processing the
+input signal.
+
+
+# Typical use case {#PWTCase}
+
+## PWT measure {#PWT}
+This is an example code to measure the pulse width:
+
+~~~~~{.c}
+int main(void)
+{
+    pwt_config_t pwtConfig;
+    uint16_t pulseWidth = 0;
+    uint8_t reg;
+    /* Board pin, clock, debug console init */
+    BOARD_InitHardware();
+
+    /* Init PWT */
+    PWT_GetDefaultConfig(&pwtConfig);
+    pwtConfig.inputSelect = kPWT_InputPort_1;
+
+    PRINTF("\r\nPWT example: input signal whose pulse width needs to be measured\r\n");
+
+    /* Enable at the NVIC */
+    EnableIRQ(PWT_INTERRUPT_NUMBER);
+
+    PWT_Init(PWT, &pwtConfig);
+
+    /* Start the PWT counter */
+    PWT_StartTimer(PWT);
+
+    /* This loop will set the print the pulse width */
+    while (1)
+    {
+        busyWait = true;
+        overflowFlag = false;
+
+        /* Enable PWT pulse ready interrupt */
+        PWT_EnableInterrupts(PWT, kPWT_PulseWidthReadyInterruptEnable);
+
+        /* Wait till ready interrupt occurs */
+        while (busyWait)
+        {
+        }
+
+        if (overflowFlag)
+        {
+            reg = ((PWT->CR) & (PWT_CR_LVL_MASK | PWT_CR_TGL_MASK)) >> PWT_CR_LVL_SHIFT;
+
+            switch (reg)
+            {
+                case 0:
+                    PRINTF("\r\nLow overflow (0 duty ratio), signal stayed low\r\n");
+                    break;
+                case 1:
+                    PRINTF("\r\nHigh overflow (100% duty ratio), signal stayed high\r\n");
+                    break;
+                case 2:
+                    PRINTF("\r\nToggled Low overflow\r\n");
+                    break;
+                default:
+                    PRINTF("\r\nToggled High overflow\r\n");
+                    break;
+            }
+        }
+        else
+        {
+            pulseWidth = PWT_ReadPositivePulseWidth(PWT);
+            pulseWidth = COUNT_TO_USEC(pulseWidth, PWT_SOURCE_CLOCK);
+            PRINTF("\r\nPositive pulse width=%d usec\r\n", pulseWidth);
+
+            pulseWidth = PWT_ReadNegativePulseWidth(PWT);
+            pulseWidth = COUNT_TO_USEC(pulseWidth, PWT_SOURCE_CLOCK);
+            PRINTF("\r\nNegative pulse width=%d usec\r\n", pulseWidth);
+        }
+        /* Clear pulse ready flag */
+        PWT_ClearStatusFlags(PWT, kPWT_PulseWidthValidFlag);
+    }
+}
+
+~~~~~
+
+*/

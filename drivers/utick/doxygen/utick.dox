@@ -1,0 +1,31 @@
+/*!
+@defgroup utick UTICK: MictoTick Timer Driver
+@details The SDK provides Peripheral driver for the UTICK module of LPC devices.
+
+UTICK driver is created to help user to operate the UTICK module. The UTICK timer can be used as a low power timer. The APIs can be used to enable the UTICK module, initialize it and set the time.
+UTICK can be used as a wake up source from low power mode.
+
+
+# Typical use case {#UTICKTpyUC}
+
+~~~~~{.c}
+   /* Init board hardware. */
+    BOARD_InitHardware();
+
+    /* Running FRO = 12 MHz*/
+    BOARD_BootClockVLPR();
+
+    /* Power up Watchdog oscillator*/
+    POWER_DisablePD(kPDRUNCFG_PD_WDT_OSC);
+
+    /* Intiialize UTICK */
+    UTICK_Init(UTICK0);
+
+    /* Set the UTICK timer to wake up the device from reduced power mode */
+    UTICK_SetTick(UTICK0, kUTICK_Repeat, UTICK_TIME, NULL);
+    while (1)
+    {
+    }
+
+~~~~~
+*/

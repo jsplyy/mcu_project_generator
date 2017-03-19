@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.usdhc.support" requires="devices.modules.DriverType_USDHC"/>
+    <component name="platform.drivers.usdhc.support.ip" requires="devices.modules.ipv_usdhc_028"/>
+    <component name="platform.drivers.usdhc.support.ip" requires="devices.modules.ipv_usdhc_core_035"/>
+    <component description="USDHC Driver" name="platform.drivers.usdhc" provides="platform.drivers" requires="platform.drivers.usdhc.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_usdhc.c"/>
+        <files mask="fsl_usdhc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

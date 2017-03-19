@@ -1,0 +1,120 @@
+/*!
+@defgroup hsadc HSADC: 12-bit 5MSPS Analog-to-Digital Converter
+@details The KSDK provides a peripheral driver for the 12-bit 5MSPS Analog-to-Digital Converter (HSADC)
+         module of Kinetis devices.
+@{
+*/
+/*!
+@defgroup hsadc_driver HSADC Peripheral driver
+@ingroup hsadc
+@details This section describes the programming interface of the HSADC Peripheral driver.
+The HSADC driver configures the HSADC module.
+
+
+The HSADC consists of two separate analog-to-digital converters, each with eight analog inputs and its own sample and hold circuit. 
+A common digital control module configures and controls the functioning of the converters. 
+
+To match the hardware feature, the HSADC driver is designed with 4 parts: APIs for configuring common digital control module, APIs for configuring each converter, 
+APIs for operating sample slots and APIs for calibration.
+
+The common digital control configuration is set when initializing the HSADC module in the application and deciding how the two converters work together. 
+The converter configuration APIs set each converter's attributes and operate them. 
+Finally, the sample slot API configures the sample slot with the input channel and gather them to be a conversion sequence. 
+After triggering (using a software trigger or an external hardware trigger), the sequence is started and the conversion is executed. 
+
+# Function groups {#HSADCFunGrps}
+
+## Initialization and deinitialization{#HSADCInit}
+
+This function group initializes/de-initializes the HSADC. The initialization should be done first before any operation to the HSADC module in the application. 
+It enables the clock and sets the configuration for the common digital control. An API is provided to fill the configuration with available default settings. 
+
+## Each converter {#HSADCConv}
+
+This function group configures each of the two converters in the HSADC module.
+
+## Each sample {#HSADCSample}
+
+This function group is for the operations to sample slot.
+
+## Calibration {#HSADCCalib}
+
+This function group calibrates to get more accurate result.
+
+# Typical use case {#HSADCTpyUC}
+
+## Triggered parallel {#HSADCTrgPal}
+
+~~~~~{.c}
+
+    hsadc_config_t hsadcConfigStruct;
+    hsadc_converter_config_t hsadcConverterConfigStruct;
+    hsadc_sample_config_t hsadcSampleConfigStruct;
+    uint16_t sampleMask;
+    
+    //...
+    
+    // Initialization for HSADC.
+    HSADC_GetDefaultConfig(&hsadcConfigStruct);
+    HSADC_Init(ADC, &hsadcConfigStruct);
+    
+    // Configures each converter.
+    HSADC_GetDefaultConverterConfig(&hsadcConverterConfigStruct);
+    HSADC_SetConverterConfig(ADC, kHSADC_ConverterA | kHSADC_ConverterB, &hsadcConverterConfigStruct);
+    // Enable the power for each converter.
+    HSADC_EnableConverterPower(ADC, kHSADC_ConverterA | kHSADC_ConverterB, true);
+    while ( (kHSADC_ConverterAPowerDownFlag | kHSADC_ConverterBPowerDownFlag)
+            == ((kHSADC_ConverterAPowerDownFlag | kHSADC_ConverterBPowerDownFlag) & HSADC_GetStatusFlags(ADC))  )
+    {}
+    // Opens the clock to each converter.
+    HSADC_EnableConverter(ADC, kHSADC_ConverterA | kHSADC_ConverterB, true);
+
+    // Configures the samples.
+    HSADC_GetDefaultSampleConfig(&hsadcSampleConfigStruct);    
+    
+    /* For converter A. */
+    hsadcSampleConfigStruct.channelNumber = DEMO_HSADC_CONVA_CHN_NUM1;
+    hsadcSampleConfigStruct.channel6MuxNumber = DEMO_HSADC_CONVA_CHN6_MUX_NUM1;
+    hsadcSampleConfigStruct.channel7MuxNumber = DEMO_HSADC_CONVA_CHN7_MUX_NUM1;
+    HSADC_SetSampleConfig(DEMO_HSADC_INSTANCE, 0U, &hsadcSampleConfigStruct);
+    HSADC_SetSampleConfig(DEMO_HSADC_INSTANCE, 1U, &hsadcSampleConfigStruct);
+
+    /* For converter B. */
+    hsadcSampleConfigStruct.channelNumber = DEMO_HSADC_CONVA_CHN_NUM2;
+    hsadcSampleConfigStruct.channel6MuxNumber = DEMO_HSADC_CONVA_CHN6_MUX_NUM2;
+    hsadcSampleConfigStruct.channel7MuxNumber = DEMO_HSADC_CONVA_CHN7_MUX_NUM2;
+    HSADC_SetSampleConfig(DEMO_HSADC_INSTANCE, 8U, &hsadcSampleConfigStruct);
+    HSADC_SetSampleConfig(DEMO_HSADC_INSTANCE, 9U, &hsadcSampleConfigStruct);
+    
+    // Enable the sample slot.
+    sampleMask = HSADC_SAMPLE_MASK(0U) // For Converter A.
+               | HSADC_SAMPLE_MASK(1U) // For Converter A.
+               | HSADC_SAMPLE_MASK(8U) // For Converter B.
+               | HSADC_SAMPLE_MASK(9U);// For Converter B.
+    HSADC_EnableSample(ADC, sampleMask, true);
+    HSADC_EnableSample(ADC, (uint16_t)(~sampleMask), false);// Disable other sample slot.
+    
+    // Triggers the converter.
+    // Triggering the converter A executes both converter conversions when in
+    // "kHSADC_DualConverterWorkAsTriggeredParallel" work mode.
+    HSADC_DoSoftwareTriggerConverter(ADC, kHSADC_ConverterA);
+
+    
+    // Waits for the conversion to be done.
+    while (kHSADC_ConverterAEndOfScanFlag != (kHSADC_ConverterAEndOfScanFlag & HSADC_GetStatusFlags(ADC)))
+    {}
+    
+    if (sampleMask == (sampleMask & HSADC_GetSampleReadyStatusFlags(ADC)) )
+    {
+        PRINTF("HSADC Value1: %d\r\n", (int16_t)HSADC_GetSampleResultValue(ADC, 0U));
+        PRINTF("HSADC Value2: %d\r\n", (int16_t)HSADC_GetSampleResultValue(ADC, 1U));
+        PRINTF("HSADC Value3: %d\r\n", (int16_t)HSADC_GetSampleResultValue(ADC, 8U));
+        PRINTF("HSADC Value4: %d\r\n", (int16_t)HSADC_GetSampleResultValue(ADC, 9U));
+    }
+    HSADC_ClearStatusFlags(ADC, kHSADC_ConverterAEndOfScanFlag);
+
+~~~~~
+
+*/
+/*! @} */
+

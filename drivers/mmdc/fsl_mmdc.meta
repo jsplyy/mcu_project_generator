@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.mmdc.support" requires="devices.modules.DriverType_MMDC"/>
+    <component name="platform.drivers.mmdc.support.ip" requires="devices.modules.ipv_mmdc_018"/>
+    <component name="platform.drivers.mmdc.support.ip" requires="devices.modules.ipv_mmdc_phy_007"/>
+    <component description="MMDC Driver" name="platform.drivers.mmdc" provides="platform.drivers" requires="platform.drivers.mmdc.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "MMDC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_mmdc.c"/>
+        <files mask="fsl_mmdc.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

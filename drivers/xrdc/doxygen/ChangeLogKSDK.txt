@@ -1,0 +1,26 @@
+/*!
+@page driver_log Driver Change Log
+
+@section xrdc XRDC
+  Current XRDC driver version is 2.0.3
+
+  - 2.0.0
+    - Initial version.
+
+  - 2.0.1
+    - Improvement:
+      - Change reserved bit fields in the structs into unnamed-identifier bit fields.
+
+  - 2.0.2
+    - Bug fix:
+      - Fix wrong assert of assignIndex input check in the xRDC driver.
+    - Improvement:
+      - Add master input CPU/non-CPU check in XRDC_SetNonProcessorDomainAssignment and XRDC_SetProcessorDomainAssignment API.
+      - Add necessary assert checks for several config inputs.
+
+  - 2.0.3
+    - Update:
+      - Add necessary driver supports for K32H844P.
+      - Add new APIs concerning new features of Exclusive Access Lock and domain programmable access flags configurations.
+
+*/

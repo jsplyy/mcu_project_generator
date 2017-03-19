@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.lpspi.support" requires="devices.modules.DriverType_LPSPI"/>
+    <component name="platform.drivers.lpspi.support.ip" requires="devices.modules.D_IP_LPSPI_SYN_010"/>
+    <component name="platform.drivers.lpspi.support.ip" requires="devices.modules.D_IP_LPSPI_SYN_015"/>
+    <component description="LPSPI Driver" name="platform.drivers.lpspi" provides="platform.drivers" requires="platform.drivers.lpspi.support platform.drivers.common" type="driver" version="2.0.1" change_log="./doxygen/ChangeLogKSDK.txt" full_name="LPSPI Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_lpspi.c"/>
+        <files mask="fsl_lpspi.h"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_lpspi_edma.c" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="platform.drivers.edma">
+        <files mask="fsl_lpspi_edma.h" requires="platform.drivers.edma"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_lpspi_freertos.c" requires="middleware.freertos"/>
+      </source>
+      <source path="./" condition="middleware.freertos">
+        <files mask="fsl_lpspi_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

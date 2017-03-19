@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.pmc0.support" requires="devices.modules.DriverType_PMC"/>
+    <component name="platform.drivers.pmc0.support.ip" requires="devices.modules.DA_SSL_ULP1_PMC_C28SOI_SYN_019"/>
+    <component description="PMC0 Driver" name="platform.drivers.pmc0" provides="platform.drivers" requires="platform.drivers.pmc0.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "PMC0 Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_pmc0.c"/>
+        <files mask="fsl_pmc0.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

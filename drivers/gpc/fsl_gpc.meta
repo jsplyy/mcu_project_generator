@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.gpc.support" requires="devices.modules.DriverType_GPC"/>
+    <component name="platform.drivers.gpc.support.ip" requires="devices.modules.d_ssl_gpc_ultra_syn_003"/>
+    <component description="GPC Driver" name="platform.drivers.gpc" provides="platform.drivers" requires="platform.drivers.gpc.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "GPC Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_gpc.h"/>
+        <files mask="fsl_gpc.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

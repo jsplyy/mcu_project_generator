@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.i2c.support" requires="devices.modules.DriverType_II2C"/>
+    <component name="platform.drivers.i2c.support.ip" requires="devices.modules.ipv_i2c_001"/>
+    <component description="I2C Driver" name="platform.drivers.i2c" provides="platform.drivers" requires="platform.drivers.i2c.support platform.drivers.i2c.support.ip" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_i2c.c"/>
+        <files mask="fsl_i2c.h"/>
+        <files mask="fsl_i2c_freertos.c" requires="middleware.freertos"/>
+        <files mask="fsl_i2c_freertos.h" requires="middleware.freertos"/>
+      </source>
+    </component>
+  </components>
+</metadata>

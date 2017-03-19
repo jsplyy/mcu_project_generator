@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.sdif.support" requires="devices.modules.DriverType_LPC_SDIF"/>
+    <component name="platform.drivers.sdif.support.ip" requires="devices.modules.sdio_2.0.0"/>
+    <component description="sdif Driver" name="platform.drivers.sdif" provides="platform.drivers" requires="platform.drivers.sdif.support platform.drivers.common" type="driver" version="2.0.1" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "sdif Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_sdif.c"/>
+        <files mask="fsl_sdif.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

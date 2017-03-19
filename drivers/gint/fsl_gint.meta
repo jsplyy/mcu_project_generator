@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.gint.support" requires="devices.modules.DriverType_LPC_GINT"/>
+    <component description="GINT Driver" name="platform.drivers.gint" provides="platform.drivers" requires="platform.drivers.gint.support platform.drivers.common" type="driver" version="2.0.0" full_name= "GINT Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_gint.h"/>
+        <files mask="fsl_gint.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

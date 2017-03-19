@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.rng.support" requires="devices.modules.DriverType_LPC_RNG"/>
+    <component description="RNG Driver" name="platform.drivers.rng" provides="platform.drivers" requires="platform.drivers.rng.support platform.drivers.common" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name= "RNG Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_rng.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>

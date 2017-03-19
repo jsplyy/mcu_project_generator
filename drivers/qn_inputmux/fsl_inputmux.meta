@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.drivers.inputmux.support" requires="devices.modules.DriverType_QN_INPUTMUX"/>
+    <component description="INPUTMUX Driver" name="platform.drivers.qn_inputmux" provides="platform.drivers" requires="platform.drivers.inputmux.support" type="driver" version="2.0.0" change_log="./doxygen/ChangeLogKSDK.txt">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_inputmux.h"/>
+        <files mask="fsl_inputmux.c"/>
+      </source>
+    </component>
+  </components>
+</metadata>

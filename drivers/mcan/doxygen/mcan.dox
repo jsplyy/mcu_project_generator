@@ -1,0 +1,7 @@
+/*!
+@defgroup mcan MCAN: Controller Area Network Driver
+@details The KSDK provides a peripheral driver for the Flex Controller Area Network (FlexCAN)
+         module of Kinetis devices.
+*/
+
+

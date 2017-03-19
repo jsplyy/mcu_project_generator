@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.flexcan.support" requires="devices.modules.DriverType_FLEXCAN"/>
+    <component name="platform.drivers.flexcan.support.ip" requires="devices.modules.D_IP_FlexCAN3_SYN_017"/>
+    <component name="platform.drivers.flexcan.support.ip" requires="devices.modules.D_IP_FlexCAN3_SYN_033"/>
+    <component name="platform.drivers.flexcan.support.ip" requires="devices.modules.D_IP_FlexCAN3_SYN_041"/>
+    <component name="platform.drivers.flexcan.support.ip" requires="devices.modules.D_IP_FlexCAN3_SYN_040"/>
+    <component name="platform.drivers.flexcan.support.ip" requires="devices.modules.D_IP_FlexCAN3_SYN_046"/>
+    <component description="FLEXCAN Driver" name="platform.drivers.flexcan" provides="platform.drivers" requires="platform.drivers.flexcan.support platform.drivers.common" type="driver" version="2.2.0" change_log="./doxygen/ChangeLogKSDK.txt" full_name="FLEXCAN Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_flexcan.c"/>
+        <files mask="fsl_flexcan.h"/>
+      </source>
+      <source path="./" condition="devices.modules.DriverFeature_FLEXCAN_DMA">
+        <files mask="fsl_flexcan_edma.c" requires="devices.modules.DriverFeature_FLEXCAN_DMA"/>
+      </source>
+      <source path="./" condition="devices.modules.DriverFeature_FLEXCAN_DMA">
+        <files mask="fsl_flexcan_edma.h" requires="devices.modules.DriverFeature_FLEXCAN_DMA"/>
+      </source>
+    </component>
+  </components>
+</metadata>

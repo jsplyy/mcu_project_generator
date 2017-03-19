@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <components>
+    <component name="platform.drivers.mrt.support" requires="devices.modules.DriverType_LPC_MRT"/>
+    <component description="MRT Driver" name="platform.drivers.mrt" provides="platform.drivers" requires="platform.drivers.mrt.support platform.drivers.common" type="driver" version="2.0.0" full_name= "MRT Driver">
+      <source path="./">
+        <files mask="*.meta"/>
+        <files mask="fsl_mrt.c"/>
+        <files mask="fsl_mrt.h"/>
+      </source>
+    </component>
+  </components>
+</metadata>
